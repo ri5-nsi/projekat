@@ -31,7 +31,7 @@
                       <span class="icon-bar"></span>
                       <span class="icon-bar"></span>
                     </button>
-                    <a class="brand" href="/">Project Management</a>
+                    <a class="brand" href="../">Project Management</a>
                     <div class="nav-collapse collapse">
                           <p class="navbar-text pull-right">
                             <a href="#">LogOn</a> |
@@ -41,9 +41,9 @@
 
                           </p>
                       <ul class="nav">
-                          <li class="active"><a href="#">Home</a></li>
-                        <li><a href="#">Project</a></li>
-                        <li><a href="#">User</a></li>
+                          <li class="active"><a href="../">Home</a></li>
+                        <li><a href="../Project/index">Project</a></li>
+                        <li><a href="../User/index">User</a></li>
                       </ul>
                     </div><!--/.nav-collapse -->
                   </div>

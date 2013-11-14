@@ -9,10 +9,10 @@
     </head>
     <body>
         <g:form name="UserForm" url="[controller:'User',action:'addUser']">
-        <h2>User</h2>
-        
+        <h2>Add User</h2>
+        <h3>${errorMessage}</h3>
         <div class="control-group">
-            <label class="control-label" for="FirstName">Firstname</label>
+            <label class="control-label" for="FirstName">First Name</label>
             <div class="controls">
             <input data-val="true" data-val-length="Must be between 2 and 50 charaters." data-val-length-max="50" data-val-length-min="2" data-val-required="This is required" id="FirstName" name="FirstName" type="text" value="${user.FirstName}">
             <span class="field-validation-valid" data-valmsg-for="FirstName" data-valmsg-replace="true"></span>
@@ -20,7 +20,7 @@
         </div>
         
         <div class="control-group">
-            <label class="control-label" for="LastName">Lastname</label>
+            <label class="control-label" for="LastName">Last Name</label>
             <div class="controls">
                 <input data-val="true" data-val-length="Must be between 2 and 50 charaters." data-val-length-max="50" data-val-length-min="2" id="LastName" name="LastName" type="text" value="${user.LastName}">
                 <span class="field-validation-valid" data-valmsg-for="LastName" data-valmsg-replace="true"></span>
@@ -30,12 +30,7 @@
         <div class="control-group">
             <label class="control-label" for="userStatus">Status</label>
             <div class="controls">
-                <select data-val="true" data-val-required="The Status field is required." id="userStatus" name="${user.UserStatus}">
-                    <option selected="selected" value="Created">Created</option>
-                    <option value="Unactive">Unactive</option>
-                    <option value="Banned">Banned</option>
-                    <option value="Active">Active</option>
-                </select>
+                <g:select name="UserStatus" from="${["Created", "Unactive", "Banned", "Active"]}" value="${user.UserStatus}" />
                 <span class="field-validation-valid" data-valmsg-for="userStatus" data-valmsg-replace="true"></span>
             </div>
         </div>
@@ -87,6 +82,7 @@
         <p>
             <input class="btn btn-primary" type="submit" value="Save" />
         </p>
+        
     </g:form>
     <div>
         <a href="#" class="btn btn-primary">Back to Users</a>

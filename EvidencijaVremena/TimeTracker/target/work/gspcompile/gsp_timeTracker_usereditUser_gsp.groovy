@@ -39,24 +39,26 @@ expressionOut.print(user.FirstName)
 printHtmlPart(8)
 expressionOut.print(user.LastName)
 printHtmlPart(9)
-expressionOut.print(user.Email)
+invokeTag('select','g',31,['name':("UserStatus"),'from':(["Created", "Unactive", "Banned", "Active"]),'value':(user.UserStatus)],-1)
 printHtmlPart(10)
+expressionOut.print(user.Email)
+printHtmlPart(11)
 })
-invokeTag('form','g',63,['name':("UserForm"),'url':([controller:'User',action:'editUser'])],2)
+invokeTag('form','g',58,['name':("UserForm"),'url':([controller:'User',action:'editUser'])],2)
 printHtmlPart(1)
-createClosureForHtmlPart(11, 2)
-invokeTag('form','g',84,['name':("UserForm"),'url':([controller:'User',action:'editUserPassword'])],2)
+createClosureForHtmlPart(12, 2)
+invokeTag('form','g',79,['name':("UserForm"),'url':([controller:'User',action:'editUserPassword'])],2)
 printHtmlPart(6)
 })
-invokeTag('captureBody','sitemesh',85,[:],1)
-printHtmlPart(12)
+invokeTag('captureBody','sitemesh',80,[:],1)
+printHtmlPart(13)
 }
 public static final Map JSP_TAGS = new HashMap()
 protected void init() {
 	this.jspTags = JSP_TAGS
 }
 public static final String CONTENT_TYPE = 'text/html;charset=UTF-8'
-public static final long LAST_MODIFIED = 1383778371684L
+public static final long LAST_MODIFIED = 1384112543877L
 public static final String EXPRESSION_CODEC = 'html'
 public static final String STATIC_CODEC = 'none'
 public static final String OUT_CODEC = 'none'

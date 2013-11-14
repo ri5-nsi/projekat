@@ -8,9 +8,9 @@
         <script src="${resource(dir: 'js', file: 'User.js')}" type="text/javascript"></script>
     </head>
     <body>
-        <g:form name="UserForm" url="[controller:'User',action:'editUser']">
+        <g:form name="UserForm" url="[controller:'User',action:'editUserData']">
             <h2>Change Data</h2>
-            <input data-val="true" data-val-number="The field UserID must be a number." data-val-required="The UserID field is required." id="UserID" name="UserID" type="hidden" value="1">
+            <input data-val="true" data-val-number="The field UserID must be a number." data-val-required="The UserID field is required." id="UserID" name="UserID" type="hidden" value="${user.UserID}">
             <div class="control-group">
                 <label class="control-label" for="FirstName">Firstname</label>
                 <div class="controls">
@@ -28,12 +28,7 @@
             <div class="control-group">
                 <label class="control-label" for="userStatus">Status</label>
                 <div class="controls">
-                    <select data-val="true" data-val-required="The Status field is required." id="userStatus" name="userStatus" class="valid">
-                        <option selected="selected" value="Created">Created</option>
-                        <option value="Unactive">Unactive</option>
-                        <option value="Banned">Banned</option>
-                        <option value="Active">Active</option>
-                    </select>
+                    <g:select name="UserStatus" from="${["Created", "Unactive", "Banned", "Active"]}" value="${user.UserStatus}" />
                     <span class="field-validation-valid" data-valmsg-for="userStatus" data-valmsg-replace="true"></span>
                 </div>
             </div>
@@ -63,7 +58,7 @@
         </g:form>
         <g:form name="UserForm" url="[controller:'User',action:'editUserPassword']">
             <h2>Change Password</h2>
-            <input data-val="true" data-val-number="The field UserID must be a number." data-val-required="The UserID field is required." id="UserID" name="UserID" type="hidden" value="1">
+            <input data-val="true" data-val-number="The field UserID must be a number." data-val-required="The UserID field is required." id="UserID" name="UserID" type="hidden" value="${user.UserID}">
             <div class="control-group">
                 <label class="control-label" for="Password">Password</label>
                 <div class="controls">

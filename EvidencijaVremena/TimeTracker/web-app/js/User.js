@@ -11,6 +11,30 @@ function guid() {
 
 $(document).ready(function () {
 
+    $("#dataGridUsers").flexigrid({
+            url: 'getUsers',
+            dataType: 'json',
+            colModel: [
+            { display: 'ID', name: 'id', width: 50, sortable: false, align: 'center', },
+            { display: 'First Name', name: 'firstName', width: 180, sortable: false, align: 'left' },
+            { display: 'Last Name', name: 'lastName', width: 230, sortable: false, align: 'left' },
+            { display: 'Username', name: 'username', width: 230, sortable: false, align: 'left' },
+            { display: 'Email', name: 'email', width: 200, sortable: false, align: 'left' },
+            { display: 'Status', name: 'status', width: 120, sortable: false, align: 'left' },
+            { display: 'Actions', name: 'actions', width:150, sortable: false, align:'center' }
+                    ],
+            sortname: "id",
+            sortorder: "asc",
+            usepager: true,
+            title: 'Users',
+            useRp: true,
+            rp: 50,
+            showTableToggleBtn: false,
+            width: 700,
+            height: 400
+        });
+
+
     // validate signup form on keyup and submit
     $("#UserForm").validate({
         rules: {

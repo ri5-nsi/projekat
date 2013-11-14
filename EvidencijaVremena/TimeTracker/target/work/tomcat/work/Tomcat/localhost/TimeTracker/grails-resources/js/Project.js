@@ -1,4 +1,4 @@
-﻿var projectVersionAddObject = '<div id="Project_ProjectVersionChild">'+
+var projectVersionAddObject = '<div id="Project_ProjectVersionChild">'+
         '<a id="RemoveProjectVersion" class="btn btn-small btn-warning"><i class="icon-remove icon-white"></i> Remove</a>'+
         '<input data-val="true" data-val-number="The field ProjectVersionID must be a number." data-val-required="The ProjectVersionID field is required." id="ProjectVersions_x__ProjectVersionID" name="ProjectVersions[x].ProjectVersionID" type="hidden" value="0">'+
         '<div class="control-group"><label class="control-label" for="ProjectVersions_x__Version">Version</label><div class="controls"><input data-val="true" data-val-length="Must be between 1 and 20 charaters." data-val-length-max="20" data-val-length-min="1" data-val-required="This is required" id="ProjectVersions_x__Version" name="ProjectVersions[x].Version" type="text" value=""><span class="field-validation-valid" data-valmsg-for="ProjectVersions[x].Version" data-valmsg-replace="true"></span></div></div>'+

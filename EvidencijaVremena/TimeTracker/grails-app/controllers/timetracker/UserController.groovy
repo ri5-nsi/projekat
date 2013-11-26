@@ -6,6 +6,36 @@ import grails.converters.JSON;
 
 class UserController {
 
+    def beforeInterceptor = [action:this.&auth]
+    
+    private auth() {
+        if(!session.user) {
+          redirect(controller:"login", action:"index")
+          return false
+        }
+        
+        timetracker.User usr = (timetracker.User)session.user;
+        
+        if(params.action =="addusr" || params.action =="addUser")
+        {
+            if(!usr.AddUser)
+            {
+                redirect(controller:"login", action:"index")
+                return false 
+            }
+        }
+        
+        if(params.action == "editUser" || params.action =="editUserData" ||
+           params.action == "deleteUser")
+        {
+            if(!usr.EditUser)
+            {
+                redirect(controller:"login", action:"index")
+                return false 
+            }
+        }
+      }
+    
     def index() { 
         timetracker.User usr = new timetracker.User();
         def map = [user: usr];

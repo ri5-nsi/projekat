@@ -6,6 +6,33 @@ import helper.dbHelper
 
 class ProjectController {
 
+    def beforeInterceptor = [action:this.&auth]
+    
+    private auth() {
+        if(!session.user) {
+          redirect(controller:"login", action:"index")
+          return false
+        }
+        
+        if(params.action =="addProject" || params.action =="addproj")
+        {
+            if(!session.user.AddProject)
+            {
+                redirect(controller:"login", action:"index")
+                return false 
+            }
+        }
+        
+        if(params.action == "editProject" || params.action == "deleteProject")
+        {
+            if(!session.user.EditProject)
+            {
+                redirect(controller:"login", action:"index")
+                return false 
+            }
+        }
+      }
+    
     def index() { 
         timetracker.Project proj = new timetracker.Project();
         def map = [project: proj];

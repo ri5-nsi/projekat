@@ -35,30 +35,44 @@ createTagBody(1, {->
 printHtmlPart(1)
 createTagBody(2, {->
 printHtmlPart(7)
-expressionOut.print(user.FirstName)
+expressionOut.print(user.UserID)
 printHtmlPart(8)
-expressionOut.print(user.LastName)
+expressionOut.print(user.FirstName)
 printHtmlPart(9)
-invokeTag('select','g',31,['name':("UserStatus"),'from':(["Created", "Unactive", "Banned", "Active"]),'value':(user.UserStatus)],-1)
+expressionOut.print(user.LastName)
 printHtmlPart(10)
-expressionOut.print(user.Email)
+invokeTag('select','g',31,['name':("UserStatus"),'from':(["Created", "Unactive", "Banned", "Active"]),'value':(user.UserStatus)],-1)
 printHtmlPart(11)
+expressionOut.print(user.Email)
+printHtmlPart(12)
+invokeTag('checkBox','g',45,['name':("AddUser"),'value':(true),'checked':(user.AddUser)],-1)
+printHtmlPart(13)
+invokeTag('checkBox','g',46,['name':("EditUser"),'value':(true),'checked':(user.EditUser)],-1)
+printHtmlPart(14)
+invokeTag('checkBox','g',48,['name':("AddProject"),'value':(true),'checked':(user.AddProject)],-1)
+printHtmlPart(15)
+invokeTag('checkBox','g',49,['name':("EditProject"),'value':(true),'checked':(user.EditProject)],-1)
+printHtmlPart(16)
 })
-invokeTag('form','g',58,['name':("UserForm"),'url':([controller:'User',action:'editUser'])],2)
+invokeTag('form','g',57,['name':("UserForm"),'url':([controller:'User',action:'editUserData'])],2)
 printHtmlPart(1)
-createClosureForHtmlPart(12, 2)
-invokeTag('form','g',79,['name':("UserForm"),'url':([controller:'User',action:'editUserPassword'])],2)
+createTagBody(2, {->
+printHtmlPart(17)
+expressionOut.print(user.UserID)
+printHtmlPart(18)
+})
+invokeTag('form','g',78,['name':("UserForm"),'url':([controller:'User',action:'editUserPassword'])],2)
 printHtmlPart(6)
 })
-invokeTag('captureBody','sitemesh',80,[:],1)
-printHtmlPart(13)
+invokeTag('captureBody','sitemesh',79,[:],1)
+printHtmlPart(19)
 }
 public static final Map JSP_TAGS = new HashMap()
 protected void init() {
 	this.jspTags = JSP_TAGS
 }
 public static final String CONTENT_TYPE = 'text/html;charset=UTF-8'
-public static final long LAST_MODIFIED = 1384112543877L
+public static final long LAST_MODIFIED = 1385331976809L
 public static final String EXPRESSION_CODEC = 'html'
 public static final String STATIC_CODEC = 'none'
 public static final String OUT_CODEC = 'none'

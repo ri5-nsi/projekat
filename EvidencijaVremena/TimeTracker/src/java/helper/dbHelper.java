@@ -72,7 +72,7 @@ public class dbHelper {
     private boolean connectToDB(){
         try{
             
-            //Class.forName("com.mysql.jdbc.Driver").newInstance();
+        	Class.forName("org.postgresql.Driver");//.newInstance();
             con = DriverManager.getConnection(dbUrl,username, password);
                         
             st = con.createStatement();

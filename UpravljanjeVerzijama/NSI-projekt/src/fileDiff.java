@@ -34,7 +34,6 @@ public class fileDiff {
 			}	
 			public void run() {
 				try {
-					System.out.println("blaaa");
 					fileDiff window = new fileDiff();
 					window.frame.setVisible(true);
 					// Helper method for get the file content
@@ -49,6 +48,32 @@ public class fileDiff {
 	                for (Delta delta: patch.getDeltas()) {
 	                        System.out.println(delta);
 	                }
+	                DiffRowGenerator.Builder builder = new DiffRowGenerator.Builder();   
+	                boolean sideBySide = true;  //default -> inline
+	                builder.showInlineDiffs(!sideBySide); 
+	                builder.columnWidth(120);
+	                DiffRowGenerator dfg = builder.build();      
+	                final StringBuilder sb = new StringBuilder();
+	                List<DiffRow> rows = dfg.generateDiffRows( original, revised);
+	                for (final DiffRow diffRow : rows)
+	                {
+	                    if (diffRow.getTag().equals(DiffRow.Tag.INSERT))
+	                    {
+	                        sb.append("+" +diffRow.getNewLine()+"\n");
+	                    }
+	                    else if (diffRow.getTag().equals(DiffRow.Tag.DELETE))
+	                    {
+	                        sb.append("-"+diffRow.getOldLine()+"\n");
+	                    }
+	                    else if (diffRow.getTag().equals(DiffRow.Tag.CHANGE))
+	                    {
+	                        sb.append("!\n");
+	                        sb.append("    -"+diffRow.getOldLine()+"\n");
+	                        sb.append("    +"+diffRow.getNewLine()+"\n");
+	                        sb.append("~\n");
+	                    }
+	                }
+	                System.out.println(sb);
 					
 				} catch (Exception e) {
 					e.printStackTrace();

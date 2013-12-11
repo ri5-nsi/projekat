@@ -1,0 +1,8 @@
+gwt-unitCache/**
+target/**
+war/**
+.project
+.gwt
+.classpath
+bin/**
+.settings/**

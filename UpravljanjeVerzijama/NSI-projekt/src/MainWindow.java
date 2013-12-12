@@ -1,6 +1,11 @@
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
+import javax.swing.JButton;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 
 public class MainWindow {
@@ -38,6 +43,15 @@ public class MainWindow {
 		frame.setBounds(100, 100, 450, 300);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
+		
+		JButton btnKlikniMe = new JButton("Klikni me");
+		btnKlikniMe.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				new fileDiff();
+			}
+		});
+		
+		btnKlikniMe.setBounds(53, 107, 117, 25);
+		frame.getContentPane().add(btnKlikniMe);
 	}
-
 }

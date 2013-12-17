@@ -16,15 +16,50 @@
 			</resource>
 		</resources>
 		<plugins>
-			<plugin>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.1</version>
-				<configuration>
-					<source>1.7</source>
-					<target>1.7</target>
-				</configuration>
-			</plugin>
-		</plugins>
+                        <plugin>
+                                <artifactId>maven-compiler-plugin</artifactId>
+                                <version>3.1</version>
+                                <configuration>
+                                        <source>1.7</source>
+                                        <target>1.7</target>
+                                </configuration>
+                        </plugin>
+                </plugins>
+		<pluginManagement>
+			<plugins>
+				<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+				<plugin>
+					<groupId>org.eclipse.m2e</groupId>
+					<artifactId>lifecycle-mapping</artifactId>
+					<version>1.0.0</version>
+					<configuration>
+						<lifecycleMappingMetadata>
+							<pluginExecutions>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>
+											org.apache.maven.plugins
+										</groupId>
+										<artifactId>
+											maven-compiler-plugin
+										</artifactId>
+										<versionRange>
+											[3.1,)
+										</versionRange>
+										<goals>
+											<goal>testCompile</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore></ignore>
+									</action>
+								</pluginExecution>
+							</pluginExecutions>
+						</lifecycleMappingMetadata>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
 	</build>
 	<dependencies>
 
@@ -45,33 +80,6 @@
 			<artifactId>postgresql</artifactId>
 			<version>9.1-901.jdbc4</version>
 		</dependency>
-		<dependency>
-		        <groupId>com.googlecode.genericdao</groupId>
-		        <artifactId>dao-hibernate</artifactId>
-		        <version>1.2.0</version> <!-- use current version -->
-		</dependency>
-		<!-- This first dependency includes all the JPA implementations for the DAOs -->
-		<dependency>
-		        <groupId>com.googlecode.genericdao</groupId>
-		        <artifactId>dao</artifactId>
-		        <version>1.2.0</version> <!-- use current version -->
-		</dependency>
-		<!-- This second one includes the Hibernate Entity Manager plugin for the framework -->
-		<dependency>
-		        <groupId>com.googlecode.genericdao</groupId>
-		        <artifactId>search-jpa-hibernate</artifactId>
-		        <version>1.2.0</version> <!-- use current version -->
-		</dependency>
-		<dependency>
-			<groupId>jboss</groupId>
-			<artifactId>jboss-client</artifactId>
-			<version>4.0.2</version>
-		</dependency>
-		<dependency>
-	        <groupId>org.springframework</groupId>
-	        <artifactId>spring-beans</artifactId>
-	        <version>2.5</version>
-	      </dependency>
 	    
 	</dependencies>
 </project>

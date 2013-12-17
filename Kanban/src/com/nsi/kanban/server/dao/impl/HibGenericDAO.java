@@ -5,8 +5,11 @@ import java.util.List;
 
 import org.hibernate.Query;
 import org.hibernate.Session;
+import org.hibernate.criterion.Projection;
+import org.hibernate.criterion.Projections;
 
 import com.nsi.kanban.server.dao.GenericDAO;
+import com.nsi.kanban.server.dao.Transaction;
 
 public class HibGenericDAO<T, ID extends Serializable> implements GenericDAO<T, ID>{
 
@@ -16,10 +19,14 @@ public class HibGenericDAO<T, ID extends Serializable> implements GenericDAO<T, 
     public HibGenericDAO(Class<T> clas) {
     	this.clas = clas;
 	}
-
-	protected Session getSession() {
+    
+	public Session getSession() {
         return session;
     }
+	
+	public Transaction getTransaction(){
+		return new HibTransaction(getSession());
+	}
     
     public void setSession(Session session){
     	this.session = session;
@@ -58,13 +65,15 @@ public class HibGenericDAO<T, ID extends Serializable> implements GenericDAO<T, 
         t = (T) hibernateSession.get(clazz, id);
         return t;
     }
- 
-    public List findAll(Class clazz) {
-        Session hibernateSession = this.getSession();
-        List T = null;
-        Query query = hibernateSession.createQuery("from " + clazz.getName());
-        T = query.list();
-        return T;
-    }
+
+	@Override
+	public Number count() {
+		return (Number) getSession().createCriteria(clas).setProjection(Projections.rowCount()).uniqueResult();
+	}
+
+	@Override
+	public List<T> findAll() {
+		return getSession().createCriteria(clas).list();
+	}
 
 }

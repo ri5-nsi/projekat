@@ -19,7 +19,11 @@ public interface GenericDAO<T, ID extends Serializable> {
  
     public T findOne(Query query);
  
-    public List findAll(Class clazz);
+    public List<T> findAll();
+    
+    public Number count();
     
     public void setSession(Session session);
+    
+    public Transaction getTransaction();
 }

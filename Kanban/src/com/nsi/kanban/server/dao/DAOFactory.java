@@ -2,6 +2,8 @@ package com.nsi.kanban.server.dao;
 
 import java.io.Serializable;
 
+import org.hibernate.Session;
+
 import com.nsi.kanban.server.dao.impl.HibDAOFactory;
 
 public abstract class DAOFactory {
@@ -16,6 +18,8 @@ public abstract class DAOFactory {
 		
 		return null;
 	}
+	
+	public abstract Session getSession();
 	
 	public abstract Transaction getTransaction();
 	

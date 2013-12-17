@@ -35,13 +35,39 @@ public class DbaTests {
 	{
 		factory = HibernateUtil.getSessionFactory();
 	}
+	
 	@Test
+	public void testKanbanCardSaveCountDelete()
+	{
+		KanbanCardManager manager = Managers.getKanbanCardManager();
+		
+		Long count = null;
+		count = manager.count();
+		
+		assert(count != null);
+		
+		KanbanCard card = new KanbanCard();
+		assert(card.getId() == null);
+		
+		manager.save(card);
+		
+		assert(manager.count() == (count + 1));
+		assert(card.getId() != null);
+		
+		manager.delete(card);
+		
+		assert(card.getId() == null);
+		assert(manager.count() == count);
+	}
+	
+	@Test
+	@Ignore
 	public void testGenericDAO()
 	{
 //		com.nsi.kanban.server.dao.KanbanCardDAO dao = new HibKanbanCardDAO();
 //		dao.setSession(HibernateUtil.getSession());
 		KanbanCard card = new KanbanCard();
-		card.setQuantity("102");
+		card.setQuantity(102);
 //		KanbanCardManager mng = Managers.getKanbanCardManager();
 //		mng.save(card);
 		
@@ -66,11 +92,23 @@ public class DbaTests {
 //			e.printStackTrace();
 //		}
 		
-		KanbanCardManager manager = new KanbanCardManager();
+//		KanbanCardManager manager = new KanbanCardManager();
+		KanbanCardManager manager = Managers.getKanbanCardManager();
 		manager.save(card);
-		
+		log.info("count: " + manager.count());
 		
 		log.info("WIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIICKED" + card.getId());
+	}
+	
+	@Test
+	@Ignore
+	public void testDAOAnnotation()
+	{
+		KanbanCardManager manager = Managers.getKanbanCardManager();
+		KanbanCard card = new KanbanCard();
+		card.setQuantity(102);
+		manager.save(card);
+		log.info("manager count: " + manager.count());
 	}
 	
 	@Test
@@ -82,7 +120,7 @@ public class DbaTests {
 		
 		tx = session.beginTransaction();
 		KanbanCard kc = new KanbanCard();
-		kc.setQuantity("100");
+		kc.setQuantity(100);
 		
 		Long kcid = (Long) session.save(kc);
 		tx.commit();

@@ -1,4 +1,4 @@
-package com.bookstore;
+package com.nsi.kanban.server.dao.impl;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;

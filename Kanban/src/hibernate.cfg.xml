@@ -13,7 +13,8 @@
   <property name="current_session_context_class">thread</property>
   <!-- Drop and re-create the database schema on startup  -->
    <property name="hbm2ddl.auto">create</property>
-  <mapping file="src/mapping/bookapp.hbm.xml"/>
-  <mapping class="com.nsi.kanban.shared.pojo.KanbanCard"/>
+<!--   <mapping file="src/mapping/bookapp.hbm.xml"/> -->
+  <mapping class="com.nsi.kanban.shared.domain.KanbanCard"/>
+  <mapping class="com.nsi.kanban.shared.domain.KanbanWorkflow"/>
  </session-factory>
 </hibernate-configuration>

@@ -1,8 +1,13 @@
 package test.dba;
 
 import java.io.Serializable;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+
+import java_cup.assoc;
 
 import org.apache.log4j.Logger;
 import org.hibernate.Hibernate;
@@ -15,28 +20,23 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import com.bookstore.BookDetails;
-import com.bookstore.HibernateUtil;
 import com.nsi.kanban.server.dao.DAOFactory;
 import com.nsi.kanban.server.dao.GenericDAO;
 import com.nsi.kanban.server.dao.KanbanCardDAO;
 import com.nsi.kanban.server.dao.exception.DAOTransactionExeption;
+import com.nsi.kanban.server.dao.impl.HibernateUtil;
 import com.nsi.kanban.server.dao.managers.KanbanCardManager;
+import com.nsi.kanban.server.dao.managers.KanbanWorkflowManager;
 import com.nsi.kanban.server.dao.managers.Managers;
-import com.nsi.kanban.shared.pojo.KanbanCard;
+import com.nsi.kanban.shared.domain.KanbanCard;
+import com.nsi.kanban.shared.domain.KanbanWorkflow;
 
 public class DbaTests {
 	
 	private static Logger log = Logger.getLogger(DbaTests.class);
-	private SessionFactory factory = null;
-	
-	@Before
-	public void initHibernate()
-	{
-		factory = HibernateUtil.getSessionFactory();
-	}
 	
 	@Test
+	@Ignore
 	public void testKanbanCardSaveCountDelete()
 	{
 		KanbanCardManager manager = Managers.getKanbanCardManager();
@@ -58,6 +58,74 @@ public class DbaTests {
 		
 		assert(card.getId() == null);
 		assert(manager.count() == count);
+	}
+	
+	@Test
+	@Ignore
+	public void testKanbanCardSaveDelete()
+	{
+		KanbanCardManager manager = Managers.getKanbanCardManager();
+		
+		KanbanCard card = new KanbanCard();
+		card.setName("name");
+		
+		manager.save(card);
+		
+		assert(card.getId() != null);
+		
+		manager.delete(card);
+		
+		assert(card.getId() == null);
+	}
+	
+	@Test
+//	@Ignore
+	public void testKanbanWorkflowSave()
+	{
+		KanbanWorkflowManager workflowManager = Managers.getKanbanWorkflowManager();
+		KanbanCardManager manager = Managers.getKanbanCardManager();
+		
+//		KanbanWorkflow workflow = new KanbanWorkflow();
+//		
+//		workflow.setName("workflow name");
+//		
+//		for(int i = 0; i < 3; i++)
+//		{
+//			KanbanCard card = new KanbanCard();
+//			
+//			manager.save(card);
+//			
+//			workflow.addCard(card);
+//		}
+//		
+//		workflowManager.save(workflow);
+	}
+	
+	@Test
+	@Ignore
+	public void testKanbanWorkflow()
+	{
+		KanbanWorkflowManager workflowManager = Managers.getKanbanWorkflowManager();
+		KanbanCardManager cardManager = Managers.getKanbanCardManager();
+//		
+		KanbanWorkflow workflow = new KanbanWorkflow();
+//		Collection list = new ArrayList<>();
+//		
+//		for(int i = 0; i < 3; i++)
+//		{
+//			KanbanCard card = new KanbanCard();
+//			
+//			card.setQuantity(new Integer(i));
+//			
+//			list.add(card);
+//		}
+//		
+//		workflow.setCards(list);
+//		
+		workflow.setName("Name");
+		
+		workflowManager.save(workflow);
+		
 	}
 	
 	@Test
@@ -98,34 +166,6 @@ public class DbaTests {
 		log.info("count: " + manager.count());
 		
 		log.info("WIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIICKED" + card.getId());
-	}
-	
-	@Test
-	@Ignore
-	public void testDAOAnnotation()
-	{
-		KanbanCardManager manager = Managers.getKanbanCardManager();
-		KanbanCard card = new KanbanCard();
-		card.setQuantity(102);
-		manager.save(card);
-		log.info("manager count: " + manager.count());
-	}
-	
-	@Test
-	@Ignore
-	public void testHibConnection()
-	{
-		Session session = factory.getCurrentSession();
-		Transaction tx = null;
-		
-		tx = session.beginTransaction();
-		KanbanCard kc = new KanbanCard();
-		kc.setQuantity(100);
-		
-		Long kcid = (Long) session.save(kc);
-		tx.commit();
-		
-		log.info(kcid);
 	}
 	
 }

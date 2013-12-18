@@ -1,4 +1,4 @@
-package com.nsi.kanban.shared.pojo;
+package com.nsi.kanban.shared.domain;
 
 import java.util.Date;
 
@@ -7,7 +7,11 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 @Entity
 @Table(name = "kanban_card")
@@ -52,15 +56,6 @@ public class KanbanCard {
 	public void setOrderDate(Date orderDate) {
 		this.orderDate = orderDate;
 	}
-
-//	@Column
-//	public Date getDueDate() {
-//		return dueDate;
-//	}
-//
-//	public void setDueDate(Date dueDate) {
-//		this.dueDate = new Date(dueDate.getTime());
-//	}
 	
 	public Integer getQuantity() {
 		return quantity;
@@ -118,7 +113,6 @@ public class KanbanCard {
 		this.location = location;
 	}
 
-	
 	public Long getId(){
 		return id;
 	}

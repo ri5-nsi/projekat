@@ -4,10 +4,10 @@ import java.io.Serializable;
 
 import org.hibernate.Session;
 
-import com.bookstore.HibernateUtil;
 import com.nsi.kanban.server.dao.DAOFactory;
 import com.nsi.kanban.server.dao.GenericDAO;
 import com.nsi.kanban.server.dao.KanbanCardDAO;
+import com.nsi.kanban.server.dao.KanbanWorkflowDAO;
 import com.nsi.kanban.server.dao.Transaction;
 
 public class HibDAOFactory extends DAOFactory {
@@ -29,10 +29,17 @@ public class HibDAOFactory extends DAOFactory {
 		dao.setSession(getSession());
 		return dao;
 	}
-	
+
 	@Override
 	public KanbanCardDAO getKanbanCardDAO() {
 		KanbanCardDAO dao = new HibKanbanCardDAO();
+		dao.setSession(getSession());
+		return dao;
+	}
+	
+	@Override
+	public KanbanWorkflowDAO getKanbanWorkflowDAO() {
+		KanbanWorkflowDAO dao = new HibKanbanWorkflowDAO();
 		dao.setSession(getSession());
 		return dao;
 	}

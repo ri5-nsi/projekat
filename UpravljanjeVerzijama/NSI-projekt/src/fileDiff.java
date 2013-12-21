@@ -7,12 +7,16 @@ import java.util.List;
 
 import difflib.*;
 
+import javax.swing.JEditorPane;
 import javax.swing.JFrame;
+import javax.swing.JScrollPane;
+import javax.swing.text.html.HTMLEditorKit;
+import javax.swing.text.html.StyleSheet;
 
 
 public class fileDiff {
 
-	private JFrame frame;
+	private static JFrame frame;
 
 	/**
 	 * Launch the application.
@@ -32,11 +36,30 @@ public class fileDiff {
                 }
                 return lines;
 			}	
+			@SuppressWarnings("deprecation")
 			public void run() {
 				try {
 					fileDiff window = new fileDiff();
 					window.frame.setVisible(true);
 					// Helper method for get the file content
+					
+					
+					JEditorPane jep = new JEditorPane();
+					jep.setEditable(false);
+					
+					HTMLEditorKit kit = new HTMLEditorKit();
+					jep.setEditorKit(kit);
+					
+					jep.setContentType("text/html");
+					
+					StyleSheet styleSheet = kit.getStyleSheet();
+					styleSheet.addRule("body {color:#000; font-family:times; margin: 4px; }");
+					styleSheet.addRule("h1 {color: blue;}");
+					styleSheet.addRule("h2 {color: #ff0000;}");
+					styleSheet.addRule("pre {font : 10px monaco; color : black; background-color : #fafafa; }");
+					styleSheet.addRule(".insert { background-color: #6FFFA2}");
+					styleSheet.addRule(".del { background-color: #f26a6a}");
+					styleSheet.addRule(".mod { padding: 3px; background-color: #56a4ad;");
 			        
 
 	                List<String> original = fileToLines("file1.txt");
@@ -57,6 +80,22 @@ public class fileDiff {
 	                List<DiffRow> rows = dfg.generateDiffRows( original, revised);
 	                for (final DiffRow diffRow : rows)
 	                {
+	                	if (diffRow.getTag().equals(DiffRow.Tag.INSERT)) // or use switch* 
+	                    {
+	                        sb.append("<div class='insert'>" + diffRow.getNewLine() + "</div>");
+	                    }
+	                    else if (diffRow.getTag().equals(DiffRow.Tag.DELETE))
+	                    {
+	                        sb.append("<div class='del'>" + diffRow.getOldLine() + "</div>");
+	                    }
+	                    else if (diffRow.getTag().equals(DiffRow.Tag.CHANGE))
+	                    {
+	                        sb.append("<div class='mod'>");
+	                        sb.append("<div class='mc'>" + diffRow.getOldLine() + "</div>");
+	                        sb.append("<div class='mc'>" + diffRow.getNewLine() + "</div>");
+	                        sb.append("</div>");
+	                    }
+	                	/*
 	                    if (diffRow.getTag().equals(DiffRow.Tag.INSERT))
 	                    {
 	                        sb.append("+" +diffRow.getNewLine()+"\n");
@@ -72,8 +111,12 @@ public class fileDiff {
 	                        sb.append("    +"+diffRow.getNewLine()+"\n");
 	                        sb.append("~\n");
 	                    }
+	                    */
 	                }
-	                System.out.println(sb);
+	                jep.setText(sb.toString());
+	                JScrollPane scrollPane = new JScrollPane(jep);
+	                frame.getContentPane().add(scrollPane);
+	                
 					
 				} catch (Exception e) {
 					e.printStackTrace();

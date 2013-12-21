@@ -23,7 +23,7 @@ public class KanbanCard {
 	private Long id;
 	
 	@Column
-	private Integer quantity;
+	private Double quantity;
 
 	@Column
 	private String name;
@@ -49,6 +49,14 @@ public class KanbanCard {
 	@Column
 	private Date dueDate;
 
+	public Date getDueDate() {
+		return dueDate;
+	}
+
+	public void setDueDate(Date dueDate) {
+		this.dueDate = dueDate;
+	}
+
 	public Date getOrderDate() {
 		return orderDate;
 	}
@@ -57,11 +65,11 @@ public class KanbanCard {
 		this.orderDate = orderDate;
 	}
 	
-	public Integer getQuantity() {
+	public Double getQuantity() {
 		return quantity;
 	}
 
-	public void setQuantity(Integer quantity) {
+	public void setQuantity(Double quantity) {
 		this.quantity = quantity;
 	}
 

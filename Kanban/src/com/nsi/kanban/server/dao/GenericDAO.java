@@ -15,11 +15,19 @@ public interface GenericDAO<T, ID extends Serializable> {
  
     public void delete(T entity);
  
+    @Deprecated
     public List<T> findMany(Query query);
  
+    @Deprecated
     public T findOne(Query query);
  
     public List<T> findAll();
+    
+    public T findByPK(ID id);
+    
+    public List<T> findAll(int startNumber, int fetchSize);
+    
+    public List<T> findByExample(T example);
     
     public Number count();
     

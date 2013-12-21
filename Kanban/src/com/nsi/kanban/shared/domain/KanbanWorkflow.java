@@ -6,11 +6,16 @@ import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchProfile;
 
 @Entity
 @Table(name = "kanban_workflow")
@@ -33,7 +38,7 @@ public class KanbanWorkflow {
 	@Column
 	private Integer kanbanLimit;
 	
-	@OneToMany
+	@OneToMany(fetch=FetchType.EAGER)
 	private List<KanbanCard> cards = null;
 
 	public List<KanbanCard> getCards() {
@@ -41,9 +46,16 @@ public class KanbanWorkflow {
 	}
 
 	public void addCard(KanbanCard card) {
-		if( cards == null)
+		if( cards == null )
 			cards = new ArrayList<>();
 		cards.add(card);
+	}
+	
+	public void addCards(KanbanCard[] cards){
+		if( cards == null ) return;
+		
+		for(KanbanCard card : cards)
+			addCard(card);
 	}
 
 	public String getName() {

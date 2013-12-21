@@ -9,9 +9,11 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.datepicker.client.DatePicker;
+import com.nsi.kanban.client.ui.CreateKanbanCardUI;
 
 public class CreateKanban implements EntryPoint {
 	
@@ -52,9 +54,13 @@ public class CreateKanban implements EntryPoint {
 			}
 		});
 
-		createFormPanel.add(getDateBtn);
-		createFormPanel.add(dateLabel);
-		createFormPanel.add(picker);
+//		createFormPanel.add(getDateBtn);
+//		createFormPanel.add(dateLabel);
+//		createFormPanel.add(picker);
+		
+		
+		final CreateKanbanCardUI cardui = new CreateKanbanCardUI();
+		createFormPanel.add(cardui);
 	}
 
 }

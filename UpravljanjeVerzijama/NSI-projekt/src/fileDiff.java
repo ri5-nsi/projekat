@@ -87,8 +87,8 @@ public class fileDiff {
 		styleSheet.addRule(".mod { padding: 3px; background-color: #56a4ad;");
         
 
-        List<String> original = fileToLines(fileOld.getName());
-        List<String> revised  = fileToLines(fileNew.getName());
+        List<String> original = fileToLines(fileOld.getAbsolutePath());
+        List<String> revised  = fileToLines(fileNew.getAbsolutePath());
         
         // Compute diff. Get the Patch object. Patch is the container for computed deltas.
         Patch patch = DiffUtils.diff(original, revised);

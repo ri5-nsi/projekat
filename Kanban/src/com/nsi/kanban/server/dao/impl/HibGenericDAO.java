@@ -93,10 +93,7 @@ public class HibGenericDAO<T, ID extends Serializable> implements GenericDAO<T, 
 
 	@Override
 	public List<T> findByExample(T example) {
-		Criteria crit = getSession()
-							.createCriteria(clas).add(Example.create(example).excludeNone())
-							
-							;
+		Criteria crit = getSession().createCriteria(clas).add(Example.create(example).excludeNone());
 		return crit.list();
 	}
 

@@ -6,6 +6,7 @@ import org.hibernate.Session;
 
 import com.nsi.kanban.server.dao.DAOFactory;
 import com.nsi.kanban.server.dao.GenericDAO;
+import com.nsi.kanban.server.dao.KanbanBoardDAO;
 import com.nsi.kanban.server.dao.KanbanCardDAO;
 import com.nsi.kanban.server.dao.KanbanWorkflowDAO;
 import com.nsi.kanban.server.dao.Transaction;
@@ -40,6 +41,13 @@ public class HibDAOFactory extends DAOFactory {
 	@Override
 	public KanbanWorkflowDAO getKanbanWorkflowDAO() {
 		KanbanWorkflowDAO dao = new HibKanbanWorkflowDAO();
+		dao.setSession(getSession());
+		return dao;
+	}
+	
+	@Override
+	public KanbanBoardDAO getKanbanBoardDAO(){
+		KanbanBoardDAO dao = new HibKanbanBoardDAO();
 		dao.setSession(getSession());
 		return dao;
 	}

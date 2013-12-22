@@ -16,5 +16,6 @@
 <!--   <mapping file="src/mapping/bookapp.hbm.xml"/> -->
   <mapping class="com.nsi.kanban.shared.domain.KanbanCard"/>
   <mapping class="com.nsi.kanban.shared.domain.KanbanWorkflow"/>
+  <mapping class="com.nsi.kanban.shared.domain.KanbanBoard"/>
  </session-factory>
 </hibernate-configuration>

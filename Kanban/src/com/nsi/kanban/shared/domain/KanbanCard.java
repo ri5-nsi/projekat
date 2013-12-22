@@ -19,7 +19,7 @@ public class KanbanCard {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(nullable = false)
+	@Column(name = "card_id", nullable = false)
 	private Long id;
 	
 	@Column
@@ -123,5 +123,12 @@ public class KanbanCard {
 
 	public Long getId(){
 		return id;
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if( obj instanceof KanbanCard )
+			return ((KanbanCard)obj).getId() == getId();
+		return super.equals(obj);
 	}
 }

@@ -27,6 +27,7 @@ public interface GenericDAO<T, ID extends Serializable> {
     
     public List<T> findAll(int startNumber, int fetchSize);
     
+    @Deprecated
     public List<T> findByExample(T example);
     
     public Number count();

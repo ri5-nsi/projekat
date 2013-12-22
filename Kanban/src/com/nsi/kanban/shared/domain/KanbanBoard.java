@@ -1,7 +1,9 @@
 package com.nsi.kanban.shared.domain;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -11,6 +13,9 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 
 @Entity
 @Table(name = "kanban_board")
@@ -29,7 +34,7 @@ public class KanbanBoard {
 	@Column
 	private String description;
 	
-	@OneToMany(fetch = FetchType.EAGER)
+	@OneToMany
 	private List<KanbanWorkflow> workflows = null;
 	
 	public Long getProjectid() {

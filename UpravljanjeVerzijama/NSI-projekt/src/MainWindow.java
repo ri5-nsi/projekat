@@ -2,10 +2,12 @@ import java.awt.EventQueue;
 
 import javax.swing.JFrame;
 import javax.swing.JButton;
+
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.io.File;
 
 
 public class MainWindow {
@@ -44,10 +46,19 @@ public class MainWindow {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
 		
+		
+		// replace with files that will be used
+		final File fOld = new File("file1.txt");
+		final File fNew = new File("file2.txt");
+
+		
 		JButton btnKlikniMe = new JButton("Klikni me");
 		btnKlikniMe.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				new fileDiff();
+				
+				//call for fileDiff window, place where needed
+				fileDiff fd = new fileDiff(fOld, fNew);
+				
 			}
 		});
 		

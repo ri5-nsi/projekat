@@ -30,6 +30,7 @@
                       <span class="icon-bar"></span>
                       <span class="icon-bar"></span>
                       <span class="icon-bar"></span>
+                      <span class="icon-bar"></span>
                     </button>
                     <a class="brand" href="../">Project Management</a>
                     <div class="nav-collapse collapse">
@@ -43,6 +44,7 @@
                         <li><a href="../Project/index">Project</a></li>
                         <li><a href="../User/index">User</a></li>
                         <li><a href="../Category/index">Category</a></li>
+                        <li><a href="../NoteTime/index">Note Time</a></li>
                       </ul>
                     </div><!--/.nav-collapse -->
                   </div>

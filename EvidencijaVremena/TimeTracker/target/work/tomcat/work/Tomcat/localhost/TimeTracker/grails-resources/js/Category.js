@@ -17,7 +17,9 @@ $(document).ready(function () {
             colModel: [
             { display: 'ID', name: 'id', width: 50, sortable: false, align: 'center' },
             { display: 'Type', name: 'type', width: 180, sortable: false, align: 'left' },
-            { display: 'Name', name: 'name', width: 230, sortable: false, align: 'left' }
+            { display: 'Name', name: 'name', width: 230, sortable: false, align: 'left' },
+         { display: 'Actions', name: 'actions', width:150, sortable: false, align:'center' }
+            
         ],
             sortname: "id",
             sortorder: "asc",

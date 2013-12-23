@@ -8,11 +8,17 @@ import javax.swing.JFrame;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -20,20 +26,35 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
+import org.eclipse.jgit.api.ArchiveCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.Status;
+import org.eclipse.jgit.api.errors.CannotDeleteCurrentBranchException;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.api.errors.InvalidRefNameException;
 import org.eclipse.jgit.api.errors.InvalidRemoteException;
 import org.eclipse.jgit.api.errors.NoHeadException;
+import org.eclipse.jgit.api.errors.NotMergedException;
+import org.eclipse.jgit.api.errors.RefAlreadyExistsException;
+import org.eclipse.jgit.api.errors.RefNotFoundException;
 import org.eclipse.jgit.api.errors.TransportException;
+import org.eclipse.jgit.lib.ObjectId;
+import org.eclipse.jgit.lib.ObjectLoader;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 
+import org.eclipse.jgit.errors.CorruptObjectException;
+import org.eclipse.jgit.errors.IncorrectObjectTypeException;
+import org.eclipse.jgit.errors.MissingObjectException;
 import org.eclipse.jgit.errors.NoWorkTreeException;
+import org.eclipse.jgit.errors.RevisionSyntaxException;
 import org.eclipse.jgit.lib.RepositoryCache.FileKey;
 import org.eclipse.jgit.revwalk.RevCommit;
+import org.eclipse.jgit.revwalk.RevTree;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
+import org.eclipse.jgit.treewalk.TreeWalk;
+import org.eclipse.jgit.treewalk.filter.PathFilter;
 import org.eclipse.jgit.util.FS;
 
 import com.thoughtworks.xstream.XStream;
@@ -95,6 +116,7 @@ public class Test {
 	private JButton btnRevisions;
 	private String AdresaRepozitorija;
 	private Repository Repozitorij;
+	private JTable tableBranches;
 	private JTree tree;
 	private JTree treeStatus;
 	private JTabbedPane centralTab;
@@ -116,6 +138,7 @@ public class Test {
 	
 	private JComboBox<RevCommitSpecial> commitList1;
 	private JComboBox<RevCommitSpecial> commitList2;
+	private JEditorPane jep;
 	
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
@@ -245,11 +268,10 @@ public class Test {
 			}
 		});
 		frmKonfiguracija.getContentPane().add(spasiKonfiguracija, "gaptop 5, align right");
-		
 		//kraj konfiguracijskog
 		
-		//početak glavnog prozora
-		
+		//********************************************************************************************
+        // GLAVNI PROZOR
 		frmUpravljanjeRevizijama = new JFrame();
 		frmUpravljanjeRevizijama.setTitle("Upravljanje verzijama");
 		frmUpravljanjeRevizijama.setBounds(100, 100, 1000, 700);
@@ -257,7 +279,7 @@ public class Test {
 		frmUpravljanjeRevizijama.setLocationRelativeTo(null);
 		if (getLocalIcon("MainIcon", "Glavna ikona") != null)
 			frmUpravljanjeRevizijama.setIconImage(getLocalIcon("MainIcon", "Glavna ikona").getImage());
-		frmUpravljanjeRevizijama.getContentPane().setLayout(new MigLayout("fillx, insets 10", "[][grow]", "[]10[270][][][240]:push[]"));
+		frmUpravljanjeRevizijama.getContentPane().setLayout(new MigLayout("fillx, insets 10", "[][grow]", "[]10[270][][][220]:push[]"));
 		
 		btnRevisions = new JButton(getLocalIcon("IconConf", "Korisnik"));
 		btnRevisions.setText("Konfiguracija");
@@ -279,6 +301,9 @@ public class Test {
 		btnPromijeni = new JButton("Promijeni");
 		btnPromijeni.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				if (!conf.IsAuthenticated())
+					return;
+				
 				JFileChooser chooser = new JFileChooser();
 				chooser.setCurrentDirectory(new File("."));
 				chooser.setDialogTitle("Lokacija repozitorija");
@@ -303,16 +328,13 @@ public class Test {
 
 		DefaultTableModel modelBranches = new DefaultTableModel(); 
 		modelBranches.addColumn("Branch:");
-		JTable tableBranches = new JTable(modelBranches);
+		tableBranches = new JTable(modelBranches);
 		DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
 		centerRenderer.setHorizontalAlignment(JLabel.CENTER);
 		tableBranches.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);
 		((DefaultTableCellRenderer)tableBranches.getTableHeader().getDefaultRenderer()).setHorizontalAlignment(JLabel.CENTER);
 		tableBranches.getTableHeader().setPreferredSize(new Dimension(200, 32));
 		tableBranches.setRowHeight(25);
-		modelBranches.addRow(new Object[] { "Branch1" });
-		modelBranches.addRow(new Object[] { "Branch2" });
-		modelBranches.addRow(new Object[] { "Branch3" });
 		frmUpravljanjeRevizijama.getContentPane().add(new JScrollPane(tableBranches), "cell 0 1, width 200, height 270");
 		
 		centralTab = new JTabbedPane();
@@ -321,11 +343,14 @@ public class Test {
 		tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
 		tree.addTreeSelectionListener(new TreeSelectionListener() {
 		    public void valueChanged(TreeSelectionEvent e) {
-		    	if (git == null)
-		    		return;
+		    	if (git == null || !conf.IsAuthenticated())
+					return;
 
 		    	try {
 		    		String selectedPath = toolBarRepositoryOperations.GetSelectionPath(false, true);
+		    		if (selectedPath == null)
+		    			return;
+		    		
 					Iterable<RevCommit> logs = git.log().addPath(selectedPath).call();
 					commitList1.removeAllItems();
 					commitList2.removeAllItems();
@@ -367,24 +392,174 @@ public class Test {
 		frmUpravljanjeRevizijama.getContentPane().add(commitList1, "cell 1 2, split 2, growx");
 		frmUpravljanjeRevizijama.getContentPane().add(commitList2, "cell 1 2, growx");
 		
+		// BRANCH BUTTONS
+		URL addBranchURL = JToolBarExtended.class.getResource("images/IconAddBranch.png");
+		JButton addBranch = new JButton();
+		if (addBranchURL != null)
+			addBranch.setIcon(new ImageIcon(addBranchURL, "Dodaj"));
+		addBranch.setText("Dodaj");
+		addBranch.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (git == null || !conf.IsAuthenticated())
+					return;
+				try {
+					String s = (String)JOptionPane.showInputDialog(null,
+		                    "Unesite naziv novog brancha: ",
+		                    "Novi branch",
+		                    JOptionPane.PLAIN_MESSAGE,
+		                    null,
+		                    null,
+		                    "");
+
+					if ((s != null) && (s.length() > 0)) {
+						String branchAdded = git.branchCreate().setName(s).call().getName();
+						((DefaultTableModel)tableBranches.getModel()).addRow(new Object[] { branchAdded } );
+					} else
+						ShowError("Problem pri kreiranju brancha, provjerite naziv");
+					
+				} catch (GitAPIException e1) {
+					ShowError("Problem pri kreiranju brancha, provjerite naziv");
+				}
+				
+			}
+		});
+		URL deleteBranchURL = JToolBarExtended.class.getResource("images/IconDeleteBranch.png");
+		JButton deleteBranch = new JButton();
+		if (deleteBranchURL != null)
+			deleteBranch.setIcon(new ImageIcon(addBranchURL, "Obriši"));
+		deleteBranch.setText("Obriši");
+		deleteBranch.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (git == null || !conf.IsAuthenticated())
+					return;
+				
+				if (tableBranches.getSelectedRow() >= 0) {
+					String deleteBranch = tableBranches.getValueAt(tableBranches.getSelectedRow(), 0).toString();
+					if (deleteBranch.endsWith("master"))
+						ShowError("Master branch nije dozvoljeno obrisati");
+					else {
+						try {
+							Object[] options = {"Potvrdi", "Odustani"};
+							int n = JOptionPane.showOptionDialog(frmUpravljanjeRevizijama, "Da li ste sigurni da želite obrisati označeni branch?",
+									"Obriši branch", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+							if (n == JOptionPane.YES_OPTION) {
+								git.branchDelete().setBranchNames(deleteBranch).call();
+								((DefaultTableModel)tableBranches.getModel()).removeRow(tableBranches.getSelectedRow());
+							}
+						} catch (GitAPIException e1) {
+							ShowError("Problem pri brisanju brancha");
+						}
+					}	
+				}
+			}
+		});
+		frmUpravljanjeRevizijama.getContentPane().add(addBranch, "cell 0 2, align left, gapright 2, growx");
+		frmUpravljanjeRevizijama.getContentPane().add(deleteBranch, "cell 0 2, gapleft 2 push, growx");
+		
+		URL zipURL = JToolBarExtended.class.getResource("images/IconZip.png");
+		JButton zipBranch = new JButton();
+		zipBranch.setIcon(new ImageIcon(zipURL, "Export"));
+		zipBranch.setText("Export branch (ZIP)");
+		zipBranch.setIconTextGap(10);
+		zipBranch.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (git == null || !conf.IsAuthenticated())
+					return;
+				
+				if (tableBranches.getSelectedRow() < 0) {
+					ShowError("Morate odabrati branch čiji sadržaj želite arhivirati");
+					return;
+				}
+				
+				JFileChooser chooser = new JFileChooser();
+				chooser.setCurrentDirectory(new File("."));
+				chooser.setDialogTitle("Odredišni direktorij");
+			    chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+			    chooser.setAcceptAllFileFilterUsed(false);
+			    int returnVal = chooser.showOpenDialog(frmUpravljanjeRevizijama);
+			    if(returnVal == JFileChooser.APPROVE_OPTION) {
+			    	try {
+			    		ArchiveBranch tmp = new ArchiveBranch();
+			    		tmp.outputDirectory = chooser.getSelectedFile().getCanonicalPath();
+						tmp.execute();
+					} catch (IOException e1) {
+						ShowError(e1.getMessage());
+					}
+			    }
+				
+			}
+		});
+		frmUpravljanjeRevizijama.getContentPane().add(zipBranch, "cell 0 3, growx");
+		
         URL revertURL = JToolBarExtended.class.getResource("images/IconRevert.png");
 		JButton revertCommit = new JButton();
 		revertCommit.setIcon(new ImageIcon(revertURL, "Revert"));
 		revertCommit.setText("Revert");
+		revertCommit.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (git == null || !conf.IsAuthenticated())
+					return;
+			}
+		});
+		
 		URL showURL = JToolBarExtended.class.getResource("images/IconShow.png");
 		JButton showContent = new JButton();
 		showContent.setIcon(new ImageIcon(showURL, "Prikaži"));
 		showContent.setText("Prikaži");
+		
 		URL combinedURL = JToolBarExtended.class.getResource("images/IconCombined.png");
 		JButton combinedView = new JButton();
 		combinedView.setIcon(new ImageIcon(combinedURL, "Prikaz razlika"));
 		combinedView.setText("Prikaz razlika");
+		combinedView.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (git == null || !conf.IsAuthenticated())
+					return;
+				
+		        try {
+		        	RevTree tree1 =  ((RevCommitSpecial)commitList1.getSelectedItem()).getRevCommit().getTree();
+					TreeWalk treeWalk1 = new TreeWalk(Repozitorij);
+					treeWalk1.addTree(tree1);
+					treeWalk1.setRecursive(true);
+			        treeWalk1.setFilter(PathFilter.create(toolBarRepositoryOperations.GetSelectionPath(false, true)));
+			        if (!treeWalk1.next()) {
+			            ShowError("Nije moguće pronaći specificiranu datoteku");
+			            return;
+			        }
+			        ObjectLoader loader1 = Repozitorij.open(treeWalk1.getObjectId(0));
+			        
+			        RevTree tree2 =  ((RevCommitSpecial)commitList2.getSelectedItem()).getRevCommit().getTree();
+					TreeWalk treeWalk2 = new TreeWalk(Repozitorij);
+					treeWalk2.addTree(tree2);
+					treeWalk2.setRecursive(true);
+			        treeWalk2.setFilter(PathFilter.create(toolBarRepositoryOperations.GetSelectionPath(false, true)));
+			        if (!treeWalk2.next()) {
+			            ShowError("Nije moguće pronaći specificiranu datoteku");
+			            return;
+			        }
+			        ObjectLoader loader2 = Repozitorij.open(treeWalk2.getObjectId(0));
+			        
+			        fileDiff(loader1.getBytes(), loader2.getBytes(), jep);
+				} catch (MissingObjectException e1) {
+					ShowError(e1.getMessage());
+				} catch (IncorrectObjectTypeException e1) {
+					ShowError(e1.getMessage());
+				} catch (CorruptObjectException e1) {
+					ShowError(e1.getMessage());
+				} catch (IOException e1) {
+					ShowError(e1.getMessage());
+				}
+		        
+			}
+		});
+		
 		frmUpravljanjeRevizijama.getContentPane().add(revertCommit, "cell 1 3, width 140");
 		frmUpravljanjeRevizijama.getContentPane().add(showContent, "cell 1 3, gapleft 5, width 140");
 		frmUpravljanjeRevizijama.getContentPane().add(combinedView, "cell 1 3, gapleft push");
 		
-		// Editor
-		JEditorPane jep = new JEditorPane();
+		//********************************************************************************************
+		// EDITOR
+		jep = new JEditorPane();
 		jep.setEditable(false);
 		
 		HTMLEditorKit kit = new HTMLEditorKit();
@@ -400,13 +575,11 @@ public class Test {
 		styleSheet.addRule(".del { background-color: #f26a6a}");
 		styleSheet.addRule(".mod { padding: 3px; background-color: #56a4ad;");
 
-		File fileOld = new File("file1.txt");
-		File fileNew = new File("file2.txt");
-        
-		fileDiff(fileOld, fileNew, jep);
         JScrollPane scrollPane = new JScrollPane(jep);
         frmUpravljanjeRevizijama.getContentPane().add(scrollPane, "cell 1 4, grow");
-
+        
+        //********************************************************************************************
+        // PROGRESS BAR
 		progressBar = new JProgressBar();
 		frmUpravljanjeRevizijama.getContentPane().add(progressBar, "cell 0 5, span 2 1, growx, height 25");
 		toolBarRepositoryOperations.setProgressBar(progressBar);
@@ -461,6 +634,9 @@ public class Test {
 				Repozitorij = builder.setGitDir(new File(AdresaRepozitorija, ".git")).readEnvironment().findGitDir().build();
 				git = new Git(Repozitorij);
 				
+				for (Ref ref : git.branchList().call())
+					((DefaultTableModel) tableBranches.getModel()).addRow(new Object[] { ref.getName() });
+				
 				toolBarRepositoryOperations.setRepository(Repozitorij);
 				txtDirektorij.setText(Repozitorij.getWorkTree().getCanonicalPath());
 				repositoryContents = new FileSystemModel(new File(Repozitorij.getWorkTree().getCanonicalPath()));
@@ -510,52 +686,57 @@ public class Test {
 		        treeStatus.setShowsRootHandles(true);
 	        }
 	        catch (NoWorkTreeException nwte) {
-				JOptionPane.showMessageDialog(frmUpravljanjeRevizijama, "Repozitorij ne sadrži radni direktorij!", "Upozorenje", JOptionPane.WARNING_MESSAGE);
+	        	ShowError("Repozitorij ne sadrži radni direktorij!");
 			} catch (IllegalStateException ise) {
-				JOptionPane.showMessageDialog(frmUpravljanjeRevizijama, "Repozitorij već postoji!", "Upozorenje", JOptionPane.WARNING_MESSAGE);
+				ShowError("Repozitorij već postoji!");
 			} catch (IOException e) {
-				JOptionPane.showMessageDialog(frmUpravljanjeRevizijama, "Problem pri pristupu izabranom direktoriju!", "Upozorenje", JOptionPane.WARNING_MESSAGE);
+				ShowError("Problem pri pristupu izabranom direktoriju!");
 			} catch (InvalidRemoteException e) {
-				JOptionPane.showMessageDialog(frmUpravljanjeRevizijama, "Problem pri pristupu udaljenom repozitoriju!", "Upozorenje", JOptionPane.WARNING_MESSAGE);
-			} catch (TransportException e) {
-				JOptionPane.showMessageDialog(frmUpravljanjeRevizijama, "Problem pri konekciji na udaljeni repozitorij!", "Upozorenje", JOptionPane.WARNING_MESSAGE);
-			} catch (GitAPIException e) {
-				JOptionPane.showMessageDialog(frmUpravljanjeRevizijama, "Problem sa GIT bibliotekom", "Upozorenje", JOptionPane.WARNING_MESSAGE);
+				ShowError("Problem pri pristupu udaljenom repozitoriju!");
+			} catch (TransportException te) {
+				ShowError("Problem pri konekciji na udaljeni repozitorij!");
+			} catch (GitAPIException gae) {
+				ShowError("Problem sa GIT bibliotekom");
+			} catch (Exception e1) {
+				ShowError("Pogreška pri učitavanju repozitorija");
 			}
 			return null;
         }
  
         @Override
         public void done() {
-        	centralTab.setCursor(null);
-        	progressBar.setIndeterminate(false);
-        	progressBar.setStringPainted(false);
+        	if (!progressBar.getString().contains("Greška")) {
+        		centralTab.setCursor(null);
+        		progressBar.setIndeterminate(false);
+        		progressBar.setStringPainted(false);	
+        	}
         }
     }
 	
 	public void ShowError(String message) {
+		progressBar.setIndeterminate(false);
 		progressBar.setForeground(Color.RED);
 		progressBar.setStringPainted(true);
 		progressBar.setString("Greška: " + message);
 	}
 	
-	private List<String> fileToLines(String filename) {
+	private List<String> fileToLines(byte[] content) {
         List<String> lines = new LinkedList<String>();
         String line = "";
         try {
-                BufferedReader in = new BufferedReader(new FileReader(filename));
-                while ((line = in.readLine()) != null) {
-                        lines.add(line);
-                }
+        	InputStream is = new ByteArrayInputStream(content);
+        	BufferedReader in = new BufferedReader(new InputStreamReader(is));
+            while ((line = in.readLine()) != null)
+                    lines.add(line);
         } catch (IOException e) {
                 e.printStackTrace();
         }
         return lines;
 	}	
 	
-	private void fileDiff(File fileOld, File fileNew, JEditorPane jep) {
-		List<String> original = fileToLines(fileOld.getAbsolutePath());
-        List<String> revised  = fileToLines(fileNew.getAbsolutePath());
+	private void fileDiff(byte[] fileOld, byte[] fileNew, JEditorPane jep) {
+		List<String> original = fileToLines(fileOld);
+        List<String> revised  = fileToLines(fileNew);
         
         // Compute diff. Get the Patch object. Patch is the container for computed deltas.
         Patch patch = DiffUtils.diff(original, revised);
@@ -588,4 +769,40 @@ public class Test {
         }
         jep.setText(sb.toString());
 	}
+	
+	
+	private class ArchiveBranch extends SwingWorker<Void, Void> {
+		public String outputDirectory;
+		
+        @Override
+        public Void doInBackground() {
+        	progressBar.setIndeterminate(true);
+			progressBar.setStringPainted(true);
+			progressBar.setString("Arhiviranje repozitorija u toku");
+			try {
+				ArchiveCommand.registerFormat("zip", new ZipArchiveFormat());
+				OutputStream out = new FileOutputStream(new File(outputDirectory, "repository.zip"));
+				git.archive().setTree(Repozitorij.resolve(tableBranches.getModel().getValueAt(tableBranches.getSelectedRow(), 0).toString())).setFormat("zip").setOutputStream(out).call();
+				out.close();
+				ArchiveCommand.unregisterFormat("zip");
+			} catch (IOException e1) {
+				ShowError("Problem sa pristupom repozitoriju");
+			} catch (RevisionSyntaxException e1) {
+				ShowError("Izabrani branch nije pronađen");
+			} catch (GitAPIException e1) {
+				ShowError("Problem sa GIT bibliotekom");
+			} catch (Exception e1) {
+				ShowError("Izabrani branch nije pronađen");
+			}
+			return null;
+        }
+ 
+        @Override
+        public void done() {
+        	if (!progressBar.getString().contains("Greška")) {
+        		progressBar.setIndeterminate(false);
+        		progressBar.setStringPainted(false);	
+        	}
+        }
+    }
 }

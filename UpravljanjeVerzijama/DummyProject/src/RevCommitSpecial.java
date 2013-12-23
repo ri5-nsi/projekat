@@ -9,6 +9,10 @@ public class RevCommitSpecial {
 		this.commit = commit;
 	}
 	
+	public RevCommit getRevCommit () {
+		return commit;
+	}
+	
 	public String toString() {
 		String s = new SimpleDateFormat("dd/MMM/yyyy, HH:mm").format(commit.getAuthorIdent().getWhen()).toString()
 				+ "  " + commit.getAuthorIdent().getName() + ": ";

@@ -33,6 +33,8 @@ $(document).ready(function () {
             width: 700,
             height: 400
         });
+        
+     
 
 
     // validate signup form on keyup and submit

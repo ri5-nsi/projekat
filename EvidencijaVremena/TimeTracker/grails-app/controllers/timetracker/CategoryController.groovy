@@ -41,6 +41,8 @@ class CategoryController {
             value.id = rs.getObject("code_value_id") as String
             value.type = rs.getObject("code_value_type")
             value.name = rs.getObject("code_value_label")
+			value.actions = "<a href=\"deleteCategory?CategoryID="+value.id+"\" >Delete</a>"
+			
             
             
             rows << [cell: value];

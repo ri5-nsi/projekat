@@ -33,8 +33,8 @@ class Category {
     
     public void DeleteCategory(String uid)
     {
-        int u= (int)uid;
-        String query = "DELETE FROM code_value WHERE code_value_id='" +u+ "';";
+       
+        String query = "DELETE FROM code_value WHERE code_value_id='" +uid+ "';";
         dbHelper.ExecuteQuery(query);
     } 
 }

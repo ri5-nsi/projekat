@@ -58,6 +58,10 @@ public class GeneralManager<T> {
 		throw new Exception("getDAO() failure");
 	}
 	
+	public Transaction getTransaction(){
+		return factory.getTransaction();
+	}
+	
 	public T save(T object)
 	{
 		Transaction tx = factory.getTransaction();

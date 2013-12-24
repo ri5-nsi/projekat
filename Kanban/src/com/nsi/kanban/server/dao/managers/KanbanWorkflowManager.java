@@ -20,28 +20,49 @@ import com.nsi.kanban.shared.domain.KanbanWorkflow;
 @DAOManager(klasa = KanbanWorkflowDAO.class)
 public class KanbanWorkflowManager extends GeneralManager {
 	
-//	public List<KanbanCard> getKanbanCards(KanbanWorkflow workflow){
-//		
-//		Transaction tx = factory.getTransaction();
+	public List<KanbanCard> getKanbanCards(KanbanWorkflow workflow){
+		
+		DAOFactory factory = DAOFactory.getFactory(DAOFactory.HIBERNATE);
+		
+		KanbanWorkflowDAO dao = null;
+		try {
+			dao = (KanbanWorkflowDAO) createDAO();
+		} catch (Exception e1) {
+			e1.printStackTrace();
+		}
+		Transaction tx = factory.getTransaction();
+		
+//		dao.setSession(session);
+		
+		List<KanbanCard> cards = null;
+		try {
+			tx.begin();
+			
+			KanbanWorkflow wf2 = dao.findByPK(workflow.getId());
+			if( wf2 != null )
+				cards = wf2.getCards();
+			
+			tx.commit();
+		} catch (DAOTransactionExeption e) {
+			e.printStackTrace();
+		}
+		
+		return cards;
+		
+//		Transaction tx = dao.getTransaction();
 //		
 //		List<KanbanCard> cards = null;
 //		try {
 //			tx.begin();
-//			
-////			GenericDAO<KanbanCard, ?> dao = (GenericDAO<KanbanCard, ?>) createDAO();
-////			cards = workflow.getCards();
-//			Hibernate.initialize(workflow.getCards());
 //			cards = workflow.getCards();
 //			
 //			tx.commit();
 //		} catch (DAOTransactionExeption e) {
 //			e.printStackTrace();
-//		} catch (Exception e) {
-//			e.printStackTrace();
 //		}
 //		
 //		return cards;
-//	}
+	}
 	
 	@Override
 	public List find(Object example) {

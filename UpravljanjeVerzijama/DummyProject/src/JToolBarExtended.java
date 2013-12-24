@@ -16,6 +16,7 @@ import javax.swing.tree.TreePath;
 import org.apache.commons.io.FileUtils;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.PushCommand;
+import org.eclipse.jgit.api.ResetCommand.ResetType;
 import org.eclipse.jgit.api.errors.ConcurrentRefUpdateException;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.NoFilepatternException;
@@ -51,15 +52,19 @@ public class JToolBarExtended extends JPanel implements ActionListener {
 	private static final String ADD = "Add";
 	private static final String DELETE = "Delete";
 	private static final String COMMIT = "Commit";
+	private static final String RESET = "Reset";
     private JTree repositoryTree;
     private Repository Repozitorij;
     private Git git;
     private JProgressBar progressBar;
     private JLabel currentBranch;
+    Test main;
 
-    public JToolBarExtended(JTree tree) {
+    public JToolBarExtended(JTree tree, Test main) {
         super(new BorderLayout());
-
+        
+        this.main = main;
+        
         this.repositoryTree = tree; 
         JToolBar toolBar = new JToolBar();
         addButtons(toolBar);
@@ -175,8 +180,11 @@ public class JToolBarExtended extends JPanel implements ActionListener {
         public Void doInBackground() {
         	if (PUSH.equals(cmd)) { 
                 try {
+                	progressBar.setIndeterminate(true);
+					progressBar.setStringPainted(true);
+					progressBar.setString("Sinhronizacija sa centralnim repozitorijem u toku!");
                 	String refspec = git.getRepository().getFullBranch();
-                	git.push().setRefSpecs(new RefSpec(refspec)).setForce(true).call();
+                	git.push().setCredentialsProvider(Test.credentialsProvider).setRefSpecs(new RefSpec(refspec)).call();
                 	
 				} catch (Exception e) {
 					ShowError(e.getMessage());
@@ -187,7 +195,6 @@ public class JToolBarExtended extends JPanel implements ActionListener {
             }
             else if (ADD.equals(cmd)) { 
             	try {
-            		System.out.println("test1");
             		File destination = new File(GetSelectionPath(true,false));
             		if (!destination.isDirectory()) {
             			throw new InvalidFormatException();
@@ -229,7 +236,7 @@ public class JToolBarExtended extends JPanel implements ActionListener {
             	try {
             		String selected = GetSelectionPath(false,true);
             		if (selected == null || selected.equals(""))
-            			return null;
+            			throw new NoFilepatternException("bla");
             		
             		Object[] options = {"Potvrdi", "Odustani"};
 					int n = JOptionPane.showOptionDialog(null, "Da li ste sigurni da želite obrisati označenu datoteku?",
@@ -256,7 +263,7 @@ public class JToolBarExtended extends JPanel implements ActionListener {
             	try {
             		String selected = GetSelectionPath(false,true);
             		if (selected == null)
-            			return null;
+            			throw new NoHeadException("bla");
             		
             		String s = (String)JOptionPane.showInputDialog(null,
             		                    "Ova operacija će spasiti sve trenutne izmjene. Da li ste sigurni?",
@@ -268,15 +275,65 @@ public class JToolBarExtended extends JPanel implements ActionListener {
 
             		if ((s != null) && (s.length() > 0)) {
             			if (selected.equals("")) {
-            				git.add().call();
+            				progressBar.setIndeterminate(true);
+    						progressBar.setStringPainted(true);
+    						progressBar.setString("Commit u toku!");
             				git.commit().setAll(true).setMessage(s).call();
             				
             			} else  {
+            				progressBar.setIndeterminate(true);
+    						progressBar.setStringPainted(true);
+    						progressBar.setString("Commit u toku!");
             				git.add().addFilepattern(selected).call();
             				git.commit().setOnly(selected).setMessage(s).call();
-            			}	
+            			}
             		}
 					
+				} catch (NoHeadException e1) {
+					ShowError("Izabrani fajl nema validnu putanju");
+				} catch (NoMessageException e1) {
+					ShowError("Nije definiran komentar za commit");
+				} catch (UnmergedPathsException e1) {
+					ShowError("Postoje nerazriješeni konflikti");
+				} catch (ConcurrentRefUpdateException e1) {
+					ShowError("Problem pri konkurentskom commitu istih datoteka");
+				} catch (WrongRepositoryStateException e1) {
+					ShowError("Postoje nerazriješeni konflikti");
+				} catch (GitAPIException e1) {
+					ShowError("Problem sa GIT bibliotekom");
+					e1.printStackTrace();
+					
+				} catch (Exception e1) {
+					ShowError(e1.getMessage());
+				}
+            }
+            else if (RESET.equals(cmd)) {
+            	try {
+            		String selected = GetSelectionPath(false,true);
+            		if (selected == null)
+            			return null;
+
+            		Object[] options = {"Potvrdi", "Odustani"};
+            		if (selected.equals("")) {
+            			int n = JOptionPane.showOptionDialog(null, "Da li ste sigurni da želite poništiti sve izmjene?",
+            					"Reset", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+            			if (n == JOptionPane.YES_OPTION) {
+            				progressBar.setIndeterminate(true);
+    						progressBar.setStringPainted(true);
+    						progressBar.setString("Reset u toku!");
+            				git.reset().setMode(ResetType.HARD).call();
+            			}
+            		} else  {
+            			int n = JOptionPane.showOptionDialog(null, "Da li ste sigurni da želite poništiti sve izmjene na izabranoj datoteci?",
+            					"Reset", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+            			if (n == JOptionPane.YES_OPTION) {
+            				progressBar.setIndeterminate(true);
+    						progressBar.setStringPainted(true);
+    						progressBar.setString("Reset u toku!");
+            				git.reset().addPath(selected).call();
+            			}
+            		}	
+
 				} catch (NoHeadException e1) {
 					ShowError("Izabrani fajl nema validnu putanju");
 				} catch (NoMessageException e1) {
@@ -299,8 +356,7 @@ public class JToolBarExtended extends JPanel implements ActionListener {
         @Override
         public void done() {
         	if (!progressBar.getString().contains("Greška")) {
-        		progressBar.setIndeterminate(false);
-            	progressBar.setStringPainted(false);
+        		main.new RefreshRepository().execute();
         	}
         }
     }

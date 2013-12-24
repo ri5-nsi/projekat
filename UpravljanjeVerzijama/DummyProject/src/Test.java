@@ -134,7 +134,7 @@ public class Test {
 	private Git git;
 	private Configuration conf = new Configuration();
 	private static final String REMOTE_URL = "https://github.com/ri5-nsi/projekat.git";
-	private static UsernamePasswordCredentialsProvider credentialsProvider = new UsernamePasswordCredentialsProvider("ri5-nsi", "Rezonansa5");
+	public static UsernamePasswordCredentialsProvider credentialsProvider = new UsernamePasswordCredentialsProvider("ri5-nsi", "Rezonansa5");
 
 	private JPasswordField passwordKonfiguracija;
 	private JCheckBox useRemoteKonfiguracija;
@@ -423,7 +423,7 @@ public class Test {
 		centralTab.addTab("Revizije", qPane2);
 		centralTab.addTab("Status", qPane3);
 		
-		toolBarRepositoryOperations = new JToolBarExtended(tree);
+		toolBarRepositoryOperations = new JToolBarExtended(tree, this);
 		toolBarRepositoryOperations.add(centralTab);
 		frmUpravljanjeRevizijama.getContentPane().add(toolBarRepositoryOperations, "cell 1 1, growx, height 270");
 		
@@ -861,7 +861,7 @@ public class Test {
 	
 	
 	
-	private class RefreshRepository extends SwingWorker<Void, Void> {
+	public class RefreshRepository extends SwingWorker<Void, Void> {
         @Override
         public Void doInBackground() {
         	try {

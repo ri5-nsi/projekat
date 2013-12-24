@@ -5,16 +5,21 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<title>Insert title here</title>
+<title>Update Resource</title>
+<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
 
+<script src="//netdna.bootstrapcdn.com/bootstrap/3.0.2/js/bootstrap.min.js"></script>
 </head>
 <body>
-
+	<div class="panel panel-default">
+	<div class="panel-body">
  <form action="resources" >
   Name: <input id="name" name="name" value="<%=request.getParameter("name")%>" type="text" /><br>
   Quantity: <input id="quantity" name="quantity" value="<%=request.getParameter("quantity")%>" type="text" /><br>
   <input type="hidden" name="resourceId" value="<%=request.getParameter("resourceId")%>" /><br>
   <input type="submit" name="update" value="Save" />
   </form>
+  </div>
+  </div>
 </body>
 </html>

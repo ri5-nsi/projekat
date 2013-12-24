@@ -1,0 +1,18 @@
+import java.text.SimpleDateFormat;
+
+import org.eclipse.jgit.lib.AnyObjectId;
+import org.eclipse.jgit.revwalk.RevCommit;
+
+
+public class RevCommitSpecial extends RevCommit {
+	
+	protected RevCommitSpecial(AnyObjectId id) {
+		super(id);
+	}
+	
+	public String toString() {
+		//return new SimpleDateFormat("dd/MMM/yyyy, HH:mm").format(this.getAuthorIdent().getWhen());
+		return getShortMessage();
+	}
+
+}

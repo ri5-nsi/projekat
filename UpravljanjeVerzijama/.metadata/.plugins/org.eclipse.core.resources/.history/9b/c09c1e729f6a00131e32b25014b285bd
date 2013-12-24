@@ -1,0 +1,174 @@
+import javax.swing.Box;
+import javax.swing.JFileChooser;
+import javax.swing.JToolBar;
+import javax.swing.JButton;
+import javax.swing.ImageIcon;
+import javax.swing.JPanel;
+import javax.swing.JTree;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreePath;
+
+import org.apache.commons.io.FileUtils;
+import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.api.errors.NoFilepatternException;
+import org.eclipse.jgit.lib.Repository;
+
+import java.io.File;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+public class JToolBarExtended extends JPanel implements ActionListener {
+
+	private static final long serialVersionUID = 1L;
+	private static final String PUSH = "Push";
+	private static final String PULL = "Pull";
+	private static final String ADD = "Add";
+	private static final String DELETE = "Delete";
+    private JTree repositoryTree;
+    private Repository Repozitorij;
+    private Git git;
+
+    public JToolBarExtended(JTree tree, Repository repository) {
+        super(new BorderLayout());
+
+        this.repositoryTree = tree;
+        this.Repozitorij = repository;
+        git = new Git(Repozitorij);
+        JToolBar toolBar = new JToolBar();
+        addButtons(toolBar);
+        toolBar.setFloatable(false);
+        toolBar.setRollover(true);
+
+        setPreferredSize(new Dimension(450, 130));
+        add(toolBar, BorderLayout.PAGE_START);
+    }
+
+    protected void addButtons(JToolBar toolBar) {
+        JButton button = null;
+        
+        toolBar.add(Box.createHorizontalGlue());
+        
+        button = makeNavigationButton("IconAdd", "Add", "Dodaj", "Dodaj");
+        toolBar.add(button);
+        
+        button = makeNavigationButton("IconDelete", "Delete", "Obriši", "Obriši");
+        toolBar.add(button);
+        
+        toolBar.addSeparator();
+
+        button = makeNavigationButton("IconPush", "Push", "Spasi", "Spasi");
+        toolBar.add(button);
+        
+        button = makeNavigationButton("IconPull", "Pull", "Ažuriraj", "Ažuriraj");
+        toolBar.add(button);
+
+        /*fourth button
+        button = new JButton("Another button");
+        button.setActionCommand(SOMETHING_ELSE);
+        button.setToolTipText("Something else");
+        button.addActionListener(this);
+        toolBar.add(button);
+
+        //fifth component is NOT a button!
+        JTextField textField = new JTextField("A text field");
+        textField.setColumns(10);
+        textField.addActionListener(this);
+        textField.setActionCommand(TEXT_ENTERED);
+        toolBar.add(textField);
+        */
+    }
+
+    protected JButton makeNavigationButton(String imageName,
+                                           String actionCommand,
+                                           String toolTipText,
+                                           String altText) {
+    	
+        String imgLocation = "images/" + imageName + ".png";
+        URL imageURL = JToolBarExtended.class.getResource(imgLocation);
+
+        //Create and initialize the button.
+        JButton button = new JButton();
+        button.setActionCommand(actionCommand);
+        button.setToolTipText(toolTipText);
+        button.setPreferredSize(new Dimension(90,18));
+        button.addActionListener(this);
+
+        if (imageURL != null) {
+            button.setIcon(new ImageIcon(imageURL, altText));
+            button.setText(altText);
+        } else {
+            button.setText(altText);
+            System.err.println("Resource not found: " + imgLocation);
+        }
+
+        return button;
+    }
+
+    public void actionPerformed(ActionEvent e) {
+        String cmd = e.getActionCommand();
+
+        if (PUSH.equals(cmd)) { 
+        	try {
+        		File destination = new File(GetSelectionPath(true));
+        		if (destination == null)
+        			return;
+        		else if (!destination.isDirectory())
+        			return;
+        		
+        		JFileChooser chooser = new JFileChooser();
+				chooser.setCurrentDirectory(new File("."));
+				chooser.setDialogTitle("Dodaj");
+			    chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+			    chooser.setMultiSelectionEnabled(true);
+			    chooser.setAcceptAllFileFilterUsed(false);
+			    int returnVal = chooser.showOpenDialog(null);
+			    if(returnVal == JFileChooser.APPROVE_OPTION) {
+			    	File[] selectedFiles = chooser.getSelectedFiles();
+			    	
+			    	
+			    	
+			    	
+			    	for (File f: selectedFiles) {
+			    		if (f.isDirectory())
+			    			FileUtils.copyDirectory(f.getCanonicalPath(), destination)
+			    		
+			    		git.add().addFilepattern("testfile").call();
+			    	}
+			    }
+			    
+        		Files.copy(source, GetSelectionPath(true), StandardCopyOption.REPLACE_EXISTING);
+				
+			} catch (NoFilepatternException e1) {
+				e1.printStackTrace();
+			} catch (GitAPIException e1) {
+				e1.printStackTrace();
+			}
+        } 
+        else if (PULL.equals(cmd)) {
+            
+        }
+        else if (ADD.equals(cmd)) { 
+        	
+        }
+        else if (DELETE.equals(cmd)) { 
+            
+        }
+    }
+    
+    private String GetSelectionPath(Boolean canonicPath) {
+    	TreePath pathElements = repositoryTree.getSelectionPath();
+    	if (pathElements == null)
+    		return null;
+    	
+    	String path = canonicPath ? pathElements.getPathComponent(0).toString() : "";
+    	for(int i=1; i<pathElements.getPathCount(); i++)
+    		path = path + "/" + pathElements.getPathComponent(i).toString();
+    	return path;
+    }
+}

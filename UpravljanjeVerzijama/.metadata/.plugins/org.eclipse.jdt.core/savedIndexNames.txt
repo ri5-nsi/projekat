@@ -1,0 +1,22 @@
+INDEX VERSION 1.126+/home/haris/Desktop/NSI/UpravljanjeVerzijama/.metadata/.plugins/org.eclipse.jdt.core
+466066742.index
+4260570858.index
+2328252206.index
+1707420863.index
+3404493365.index
+4226147756.index
+2500366158.index
+1502979822.index
+1516564492.index
+1584379322.index
+3140562224.index
+519037298.index
+2350945461.index
+798750034.index
+1572750670.index
+2435929093.index
+1665266993.index
+796216283.index
+3195840860.index
+2045263757.index
+3977493936.index

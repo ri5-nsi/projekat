@@ -7,6 +7,10 @@
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 <title>Projects</title>
 
+<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
+
+<script src="//netdna.bootstrapcdn.com/bootstrap/3.0.2/js/bootstrap.min.js"></script>
+
 <script>
 function displayDetails()
 {
@@ -20,7 +24,7 @@ function displayDetails()
 	document.getElementById("endOn").value=fields[5];
 	document.getElementById("id").value=fields[6];
 	
-	document.getElementById("projectId").value=fields[6];
+
 	
 }
 
@@ -78,16 +82,17 @@ font-family:Verdana;
 </head>
 
 <body>
+<div class="panel panel-default">
 <jsp:include page="Layout.jsp"></jsp:include>
-<div>
-<p>Select a project to preview details:</p>
+<div class="panel-body">
+<div class="panel-heading">Select a project to preview details:</div>
 <select name="projects" id="projects" style="width: 200px" onchange=displayDetails()>
 <c:forEach items="${projects}" var="project">
         <option value="${project.name}, ${project.budget}, ${project.code}, ${project.description}, ${project.startOn}, ${project.endOn}, ${project.id}">${project.name }</option>
     </c:forEach>
 </select>
 <div id="details" style="display:none">
-<p>Project details <br> </p>
+<div class="panel-heading">Project details <br> </div>
 <form method="post" action="projects">
 <input type="hidden" name="id" id="id">
 Name: <input id="name" type="text" treadonly style="border-style:none" name="name"></input> <br>
@@ -99,12 +104,10 @@ Ends on: <input id="endOn" type="text" readonly style="border-style:none" name="
 <input type="submit" style="display:none" id="pushEdit" value="Save Changes">
 <a id="editProject" onclick="editProject()">Edit</a>
 </form>
-<form method="get" action="AddResource.jsp">
-<input type="hidden" name="projectId" id="projectId" />
-<input type="submit" value="Add Resource"/>
-</form>
 
 
+
+</div>
 </div>
 </div>
 </body>

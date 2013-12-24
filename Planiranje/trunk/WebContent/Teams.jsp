@@ -4,6 +4,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
+
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 <title>Teams</title>
 
@@ -43,7 +44,19 @@ font-family:Verdana;
 </head>
 
 <body>
-
+       <form method="post" action="teams?add=1" class="navbar-form navbar-left" role="search" >
+  				<div class="form-group">
+  					  <input type="text" name="team-name" class="form-control"   placeholder="Team name">
+ 				 </div>
+ 				 <button type="submit" class="btn btn-default">Add team</button>
+  		 </form>
+  		 
+  		 <br>
+  		 <br>
+  		 <br>
+  		 
+        <h4 style="color:red">${errorText}</h4>
+      
 <div>
 
 
@@ -51,16 +64,14 @@ font-family:Verdana;
       <div class="panel panel-default">
         <!-- Default panel contents -->
         <div class="panel-heading">Teams preview</div>
-        <div class="panel-body">
-          <a href="">Add team</a>
-        </div>
+       
 
         <!-- Table -->
         <table class="table">
           <thead>
             <tr>
            
-              <th>#</th>
+              
               <th>Team name</th>
              
             </tr>
@@ -70,8 +81,8 @@ font-family:Verdana;
            
              <c:forEach items="${teams}" var="team">
          		<tr>
-        	  <td>1</td>
-              <td>${team.name}</td>
+        	 
+              <td><a href="team-member?team-id=${team.team_id}">${team.name}</a></td>
                </tr>
     		</c:forEach>
               

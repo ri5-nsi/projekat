@@ -36,11 +36,13 @@ public class ResourceServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 	 try {
+		
 		/**/
 		if(request.getParameter("add")!=null) {
 		    String name=request.getParameter("name");
 		    double quantity=Double.parseDouble(request.getParameter("quantity"));
 		    String project_id=request.getParameter("projectId").trim();
+		    if(project_id==null) throw new Exception("Niste oznacili projekat");
 		     JdbcObjectProjectDAO.addResource(name, quantity, project_id);
 		 }
 		else if(request.getParameter("update")!=null) {
@@ -56,16 +58,14 @@ public class ResourceServlet extends HttpServlet {
 		else if(request.getParameter("delete")!=null) {
 			String projectId=request.getParameter("projectId");
 		    String resourceId=request.getParameter("resourceId");
-		   	   System.out.print(projectId); 
-		   	System.out.print(" TESTEST "); 
-		   	System.out.print(resourceId); 
-		   // JdbcObjectProjectDAO.deleteResource(projectId,resourceId);
+		   	JdbcObjectProjectDAO.deleteResource(projectId,resourceId);
 		}
 		else {
 			     ArrayList<Project> projects = JdbcObjectProjectDAO.getProjects(); // Obtain all projects.
 			     request.setAttribute("projects", projects); // Store projects in request scope.
 			     request.setAttribute("total", projects.size());
 				 String projectId=request.getParameter("projects");
+				 request.setAttribute("projectId", projectId);
 			    //ArrayList<Resource> resources = JdbcObjectProjectDAO.getResources("30222299-9909-4458-1164-666922380421"); // Obtain all resources from specific project.
 				 ArrayList<Resource> resources = JdbcObjectProjectDAO.getResources(projectId); // Obtain all resources from specific project.
 				    

@@ -1,0 +1,103 @@
+import javax.swing.JToolBar;
+import javax.swing.JButton;
+import javax.swing.ImageIcon;
+import javax.swing.JPanel;
+import java.net.URL;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+public class JToolBarExtended extends JPanel implements ActionListener {
+	
+    static final private String PUSH = "Push";
+    static final private String PULL = "Pull";
+    static final private String ADD = "Add";
+    static final private String DELETE = "Delete";
+
+    public JToolBarExtended() {
+        super(new BorderLayout());
+
+        JToolBar toolBar = new JToolBar();
+        addButtons(toolBar);
+        toolBar.setFloatable(false);
+        toolBar.setRollover(true);
+
+        setPreferredSize(new Dimension(450, 130));
+        add(toolBar, BorderLayout.PAGE_START);
+    }
+
+    protected void addButtons(JToolBar toolBar) {
+        JButton button = null;
+        
+        button = makeNavigationButton("IconConf", "Add", "Dodaj", "Dodaj");
+        toolBar.add(button);
+        
+        button = makeNavigationButton("IconDelete", "Delete", "Obriši", "Obriši");
+        toolBar.add(button);
+        
+        toolBar.addSeparator();
+
+        button = makeNavigationButton("IconPush", "Push", "Spasi", "Spasi");
+        toolBar.add(button);
+        
+        button = makeNavigationButton("IconPull", "Pull", "Ažuriraj", "Ažuriraj");
+        toolBar.add(button);
+
+        /*fourth button
+        button = new JButton("Another button");
+        button.setActionCommand(SOMETHING_ELSE);
+        button.setToolTipText("Something else");
+        button.addActionListener(this);
+        toolBar.add(button);
+
+        //fifth component is NOT a button!
+        JTextField textField = new JTextField("A text field");
+        textField.setColumns(10);
+        textField.addActionListener(this);
+        textField.setActionCommand(TEXT_ENTERED);
+        toolBar.add(textField);
+        */
+    }
+
+    protected JButton makeNavigationButton(String imageName,
+                                           String actionCommand,
+                                           String toolTipText,
+                                           String altText) {
+    	
+        String imgLocation = "images/" + imageName + ".png";
+        URL imageURL = JToolBarExtended.class.getResource(imgLocation);
+
+        //Create and initialize the button.
+        JButton button = new JButton();
+        button.setActionCommand(actionCommand);
+        button.setToolTipText(toolTipText);
+        button.addActionListener(this);
+
+        if (imageURL != null) {
+            button.setIcon(new ImageIcon(imageURL, altText));
+            button.setText(altText);
+        } else {
+            button.setText(altText);
+            System.err.println("Resource not found: " + imgLocation);
+        }
+
+        return button;
+    }
+
+    public void actionPerformed(ActionEvent e) {
+        String cmd = e.getActionCommand();
+
+        if (PUSH.equals(cmd)) { 
+        } 
+        else if (PULL.equals(cmd)) {
+            
+        }
+        else if (DELETE.equals(cmd)) { 
+            
+        }
+        else if (DELETE.equals(cmd)) { 
+            
+        }
+    }
+}

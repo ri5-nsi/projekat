@@ -6,11 +6,19 @@
 </a>
 <br>
 <a href="/ProjectPlanning/resources">
-<img alt="resourceIcon" src="images/resource.jpg">
+<img alt="resourceIcon" src="images/resourceIcon.jpg">
 <br>
 <span>RESOURCES</span>
 </a>
 <br>
+
+<a href="/ProjectPlanning/teams?project-id=2e3665bf-7a9f-448f-ae27-a303dc64b5dc">
+<img alt="resourceIcon" src="http://thumbs.dreamstime.com/m/business-people-team-work-ball-stand-together-around-teamwork-symbol-31398383.jpg">
+<br>
+<span>TEAMS</span>
+</a>
+<br>
+
 <a href="">
 <img alt="taskIcon" src="images/task.jpg">
 <br>

@@ -20,23 +20,26 @@ public class TeamDAO {
 	public static void addTeam(String name,String project_id) throws Exception {
 		
 		   try {
-			   String team_id = UUID.randomUUID().toString().replaceAll("-", "");
-			   String team_project_id=UUID.randomUUID().toString().replaceAll("-", "");
-			   // insert into resource table
+			   UUID team_id = UUID.randomUUID();
+			   UUID team_project_id=UUID.randomUUID();
+			   UUID project_idUU = UUID.fromString(project_id);
 			   PreparedStatement st1 = c.prepareStatement("INSERT INTO team (team_id,name) VALUES (?,?)"); 
 			   // insert into resource_project table
 			   PreparedStatement st2 = c.prepareStatement("INSERT INTO team_project (team_project_id,team, project) VALUES (?,?,?)");
 			   
-			   st1.setString(1, team_id);
+			   st1.setObject(1, team_id);
 			   st1.setString(2, name);
 			   
 			  
-			   st2.setString(1, team_project_id);
-			   st2.setString(2, project_id);
-			   st2.setString(3, team_id);
+			   st2.setObject(1, team_project_id);
+			   st2.setObject(2, team_id);
+			   st2.setObject(3, project_idUU);
 			  
 			   st1.executeUpdate();
+			   
 			   st2.executeUpdate();
+			   st1.close();
+			   st2.close();
 		   }
 			catch(Exception e) {
 				throw new Exception ("Unable to insert resource data to database. Error: " +e.getMessage());
@@ -66,6 +69,30 @@ public class TeamDAO {
 		}
 		
 		return teams;
+	}
+	
+	public static Team getTeam(String projectId) throws Exception {
+		Team t = new Team();
+		try
+		{
+			PreparedStatement st = c.prepareStatement("SELECT team_id, name FROM  team  WHERE team_id=?::uuid");
+			
+			st.setString(1, projectId);
+			ResultSet rs = st.executeQuery();
+			 rs.toString();
+			
+					while (rs.next()) {
+						
+						t.setTeam_id(rs.getString(1));
+						t.setName(rs.getString(2));			
+					
+					}
+		}
+		catch (Exception e) {
+			throw new Exception ("Unable to retrieve list of resources from database. Error: " + e.getMessage());
+		}
+		
+		return t;
 	}
 	
 	

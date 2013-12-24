@@ -1,0 +1,17 @@
+import java.text.SimpleDateFormat;
+import org.eclipse.jgit.revwalk.RevCommit;
+
+
+public class RevCommitSpecial {
+	private RevCommit commit;
+	
+	public RevCommitSpecial(RevCommit commit) {
+		this.commit = commit;
+	}
+	
+	public String toString() {
+		return new SimpleDateFormat("dd/MMM/yyyy, HH:mm").format(commit.getAuthorIdent().getWhen()).toString()
+				+ "  Autor: " + commit.getAuthorIdent().getName();
+	}
+
+}

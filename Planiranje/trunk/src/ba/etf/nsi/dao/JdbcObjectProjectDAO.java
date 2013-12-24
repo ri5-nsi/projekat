@@ -5,6 +5,7 @@ import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.UUID;
+import ba.etf.nsi.models.Task;
 
 import ba.etf.nsi.models.Project;
 
@@ -192,6 +193,71 @@ public class JdbcObjectProjectDAO {
 			st.setString(4, description);
 			st.setDate(5, sqlStartDate);
 			st.setDate(6, sqlEndDate);
+			st.setString(7, id);
+			st.execute();
+		}
+		catch (Exception e) {
+			throw new Exception ("Unable to store updates to database. Error: " + e.getMessage());
+		}
+	}
+	
+	public static void addTask (String name, double hoursPlaned) throws Exception {
+		try{
+			String project_id = UUID.randomUUID().toString().replaceAll("-", "");
+			PreparedStatement st = c.prepareStatement("INSERT INTO task (task_id, name, hours_planed) VALUES (?,?,?)");
+			st.setString(1, project_id);
+			st.setString(2, name);
+			st.setDouble(3, hoursPlaned);
+			st.executeUpdate();
+		}
+		catch (Exception e) {
+			throw new Exception ("Unable to insert project data to database. Error: " +e.getMessage());
+		}
+	}
+	
+	public static ArrayList<Task> getTasks () throws Exception {
+		ArrayList<Task> tasks = new ArrayList<Task>();
+		try
+		{
+			PreparedStatement st = c.prepareStatement("SELECT task_id, name, start_on, end_on, hours_planed, status, code FROM task");
+					ResultSet rs = st.executeQuery();
+					while (rs.next()) {
+						Task t = new Task();
+						t.setId(rs.getString(1));
+						t.setName(rs.getString(2));
+						t.setStartOn(rs.getString(3));
+						t.setEndOn(rs.getString(4));
+						t.setHoursPlaned(rs.getDouble(5));
+						t.setStatus(rs.getInt(6));
+						t.setCode(rs.getInt(7));
+						tasks.add(t);
+					}
+		}
+		catch (Exception e) {
+			throw new Exception ("Unable to retrieve list of tasks from database. Error: " + e.getMessage());
+		}
+		return tasks;
+	}
+	
+	public static void updateTasks(String id, String name, String startOn, String endOn, double hoursPlaned, int status, int code) throws Exception
+	{
+		try 
+		{
+			PreparedStatement st = c.prepareStatement("UPDATE task SET name=?, start_on=?, end_on=?, hours_planed=?, status=?, code=?=? WHERE task_id=?::uuid");
+			SimpleDateFormat format = new SimpleDateFormat("yyyy-mm-dd");
+			java.util.Date startDate=format.parse(startOn);
+			Date sqlStartDate=new Date (startDate.getDate());
+			
+			java.util.Date endDate=format.parse(endOn);
+			Date sqlEndDate=new Date (startDate.getDate());
+			
+			
+			st.setString(1, name);
+			st.setDate(2, sqlStartDate);
+			st.setDate(3, sqlEndDate);
+			st.setDouble(4, hoursPlaned);
+			st.setDouble(5, status);
+			st.setDouble(6, code);
 			st.setString(7, id);
 			st.execute();
 		}

@@ -25,6 +25,7 @@ public abstract class DAOFactory {
 	
 	public abstract KanbanCardDAO getKanbanCardDAO();
 	public abstract KanbanWorkflowDAO getKanbanWorkflowDAO();
+	public abstract KanbanBoardDAO getKanbanBoardDAO();
 	
 	public abstract <T, ID extends Serializable> GenericDAO<T, ID> getGenericDAO(Class<T> clas);
 	

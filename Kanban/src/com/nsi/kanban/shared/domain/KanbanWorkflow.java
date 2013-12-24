@@ -2,13 +2,19 @@ package com.nsi.kanban.shared.domain;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
@@ -41,9 +47,16 @@ public class KanbanWorkflow {
 	}
 
 	public void addCard(KanbanCard card) {
-		if( cards == null)
+		if( cards == null )
 			cards = new ArrayList<>();
 		cards.add(card);
+	}
+	
+	public void addCards(KanbanCard[] cards){
+		if( cards == null ) return;
+		
+		for(KanbanCard card : cards)
+			addCard(card);
 	}
 
 	public String getName() {
@@ -80,5 +93,12 @@ public class KanbanWorkflow {
 	
 	public Long getId() {
 		return id;
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if( obj instanceof KanbanWorkflow )
+			return ((KanbanWorkflow)obj).getId() == getId();
+		return super.equals(obj);
 	}
 }

@@ -1,0 +1,27 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui">
+	<ui:style>
+		.important {
+			font-weight: bold;
+		}
+		.kanbanBoard {
+			background-color: lightcyan;
+		}
+	</ui:style>
+	<g:HTMLPanel>
+	<g:HorizontalPanel width="466px" height="133px" styleName="{style.kanbanBoard}">
+		<g:VerticalPanel>
+			<g:Label text="New Label" width="131px" height="56px"/>
+		</g:VerticalPanel>
+		<g:VerticalPanel width="120px">
+			<g:Label text="New Label" width="85px"/>
+			<g:Label text="New Label" width="80px"/>
+			<g:Label text="New Label"/>
+		</g:VerticalPanel>
+		<g:VerticalPanel width="103px">
+			<g:Label text="New Label"/>
+		</g:VerticalPanel>
+	</g:HorizontalPanel>
+	</g:HTMLPanel>
+</ui:UiBinder> 

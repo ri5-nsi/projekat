@@ -3,8 +3,10 @@ package com.nsi.kanban.server.dao.impl;
 import java.io.Serializable;
 import java.util.List;
 
+import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
+import org.hibernate.criterion.Example;
 import org.hibernate.criterion.Projection;
 import org.hibernate.criterion.Projections;
 
@@ -74,6 +76,25 @@ public class HibGenericDAO<T, ID extends Serializable> implements GenericDAO<T, 
 	@Override
 	public List<T> findAll() {
 		return getSession().createCriteria(clas).list();
+	}
+
+	@Override
+	public T findByPK(ID id) {
+		return (T) getSession().get(clas, id);
+	}
+
+	@Override
+	public List<T> findAll(int startNumber, int fetchSize) {
+		Criteria crit = getSession().createCriteria(clas);
+		crit.setFirstResult(startNumber);
+		crit.setFetchSize(fetchSize);
+		return crit.list();
+	}
+
+	@Override
+	public List<T> findByExample(T example) {
+		Criteria crit = getSession().createCriteria(clas).add(Example.create(example).excludeNone());
+		return crit.list();
 	}
 
 }

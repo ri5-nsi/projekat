@@ -1,0 +1,76 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:p1="urn:import:com.google.gwt.user.datepicker.client">
+	<ui:style>
+		.important {
+			font-weight: bold;
+		}
+		.dialogTitle {
+			font-size: 18px;
+		}
+	</ui:style>
+	<g:HTMLPanel>
+		<g:AbsolutePanel height="351px">
+			<g:at left="108" top="46">
+				<g:TextBox width="149px" height="6px" ui:field="nameBox"/>
+			</g:at>
+			<g:at left="10" top="46">
+				<g:Label text="Card Name" width="91px" height="18px"/>
+			</g:at>
+			<g:at left="357" top="311">
+				<g:Button text="Create card"/>
+			</g:at>
+			<g:at left="10" top="70">
+				<g:Label text="Description" width="91px" height="18px"/>
+			</g:at>
+			<g:at left="10" top="143">
+				<g:Label text="SubjectID" width="91px" height="18px"/>
+			</g:at>
+			<g:at left="108" top="143">
+				<g:TextBox width="149px" height="6px" ui:field="subjectBox"/>
+			</g:at>
+			<g:at left="108" top="167">
+				<g:TextBox width="149px" height="6px" ui:field="plannerBox"/>
+			</g:at>
+			<g:at left="10" top="167">
+				<g:Label text="Planner" width="91px" height="18px"/>
+			</g:at>
+			<g:at left="108" top="191">
+				<g:TextBox width="149px" height="6px" ui:field="supplierBox"/>
+			</g:at>
+			<g:at left="10" top="191">
+				<g:Label width="91px" height="18px" text="Supplier"/>
+			</g:at>
+			<g:at left="108" top="215">
+				<g:TextBox width="149px" height="6px" ui:field="locationBox"/>
+			</g:at>
+			<g:at left="10" top="215">
+				<g:Label width="91px" height="18px" text="Location"/>
+			</g:at>
+			<g:at left="10" top="239">
+				<g:Label width="91px" height="18px" text="Quantity"/>
+			</g:at>
+			<g:at left="108" top="239">
+				<g:DoubleBox width="155px" height="12px" ui:field="quantityBox"/>
+			</g:at>
+			<g:at left="10" top="263">
+				<g:Label width="91px" height="18px" text="Order date"/>
+			</g:at>
+			<g:at left="10" top="287">
+				<g:Label width="91px" height="18px" text="Due date"/>
+			</g:at>
+			<g:at left="108" top="263">
+				<p1:DateBox width="149px" height="6px" ui:field="orderDatePicker"/>
+			</g:at>
+			<g:at left="108" top="287">
+				<p1:DateBox width="149px" height="6px" ui:field="dueDatePicker"/>
+			</g:at>
+			<g:at left="10" top="10">
+				<g:Label text="Create Kanban card dialog" width="257px" height="30px" styleName="{style.dialogTitle}"/>
+			</g:at>
+			<g:at left="108" top="70">
+				<g:TextArea width="318px" height="57px" ui:field="descriptionBox"/>
+			</g:at>
+		</g:AbsolutePanel>
+	</g:HTMLPanel>
+</ui:UiBinder> 

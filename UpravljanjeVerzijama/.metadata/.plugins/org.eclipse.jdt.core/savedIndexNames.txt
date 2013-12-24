@@ -9,6 +9,7 @@ INDEX VERSION 1.126+/home/haris/Desktop/NSI/UpravljanjeVerzijama/.metadata/.plug
 1502979822.index
 1516564492.index
 1584379322.index
+1612906488.index
 3140562224.index
 519037298.index
 2350945461.index

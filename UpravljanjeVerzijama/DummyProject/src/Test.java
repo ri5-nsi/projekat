@@ -10,8 +10,6 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -20,26 +18,21 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.commons.io.IOUtils;
 import org.eclipse.jgit.api.ArchiveCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.Status;
-import org.eclipse.jgit.api.errors.CannotDeleteCurrentBranchException;
 import org.eclipse.jgit.api.errors.CheckoutConflictException;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.InvalidRefNameException;
 import org.eclipse.jgit.api.errors.InvalidRemoteException;
 import org.eclipse.jgit.api.errors.NoHeadException;
-import org.eclipse.jgit.api.errors.NotMergedException;
 import org.eclipse.jgit.api.errors.RefAlreadyExistsException;
 import org.eclipse.jgit.api.errors.RefNotFoundException;
 import org.eclipse.jgit.api.errors.TransportException;
-import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.ObjectLoader;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
@@ -70,11 +63,9 @@ import javax.swing.JComboBox;
 import javax.swing.JEditorPane;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
-import javax.swing.JSeparator;
 import javax.swing.JTabbedPane;
 import javax.swing.JButton;
 import javax.swing.JTable;
@@ -89,11 +80,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-import javax.swing.JList;
 import javax.swing.JTree;
-import javax.swing.SwingConstants;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -105,7 +92,6 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeSelectionModel;
 
 import de.javasoft.plaf.synthetica.SyntheticaBlackMoonLookAndFeel;
-import difflib.Delta;
 import difflib.DiffRow;
 import difflib.DiffRowGenerator;
 import difflib.DiffUtils;
@@ -132,7 +118,7 @@ public class Test {
 	private JProgressBar progressBar;
 	private LoadRepository loadRepository;
 	private Git git;
-	private Configuration conf = new Configuration();
+	public Configuration conf = new Configuration();
 	private static final String REMOTE_URL = "https://github.com/ri5-nsi/projekat.git";
 	public static UsernamePasswordCredentialsProvider credentialsProvider = new UsernamePasswordCredentialsProvider("ri5-nsi", "Rezonansa5");
 
@@ -214,7 +200,7 @@ public class Test {
 		frmKonfiguracija.getContentPane().add(repoURL, "width 300, wrap");
 		
 		useRemoteKonfiguracija = new JCheckBox("Uspostavi konekciju sa centralnim repozitorijem");
-		useRemoteKonfiguracija.setSelected(true);
+		useRemoteKonfiguracija.setSelected(conf.getClone());
 		frmKonfiguracija.getContentPane().add(useRemoteKonfiguracija, "growx, span 2, wrap");
 		
 		usernameKonfiguracija = new JTextField(conf.getUser());
@@ -264,6 +250,7 @@ public class Test {
 						XStream xstream = new XStream(new StaxDriver());
 						BufferedWriter out = new BufferedWriter(new FileWriter("konfiguracija.xml"));
 						conf.setPassword("");
+						conf.setClone(useRemoteKonfiguracija.isSelected());
 						out.write(xstream.toXML(conf));
 						out.close();
 						frmKonfiguracija.setVisible(false);
@@ -533,21 +520,43 @@ public class Test {
 		});
 		frmUpravljanjeRevizijama.getContentPane().add(zipBranch, "cell 0 3, growx");
 		
-        URL revertURL = JToolBarExtended.class.getResource("images/IconRevert.png");
-		JButton revertCommit = new JButton();
-		revertCommit.setIcon(new ImageIcon(revertURL, "Revert"));
-		revertCommit.setText("Revert");
-		revertCommit.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				if (git == null || !conf.IsAuthenticated())
-					return;
-			}
-		});
-		
 		URL showURL = JToolBarExtended.class.getResource("images/IconShow.png");
 		JButton showContent = new JButton();
 		showContent.setIcon(new ImageIcon(showURL, "Prikaži"));
 		showContent.setText("Prikaži");
+		showContent.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (git == null || !conf.IsAuthenticated())
+					return;
+				
+		        try {
+		        	RevTree tree =  ((RevCommitSpecial)commitList1.getSelectedItem()).getRevCommit().getTree();
+					TreeWalk treeWalk = new TreeWalk(Repozitorij);
+					treeWalk.addTree(tree);
+					treeWalk.setRecursive(true);
+			        treeWalk.setFilter(PathFilter.create(toolBarRepositoryOperations.GetSelectionPath(false, true)));
+			        if (!treeWalk.next()) {
+			            ShowError("Nije moguće pronaći specificiranu datoteku");
+			            return;
+			        }
+			        
+			        ObjectLoader loader = Repozitorij.open(treeWalk.getObjectId(0));
+			        List<String> fileLines = fileToLines(loader.getBytes());
+			        StringBuilder sb = new StringBuilder();
+			        for (String s : fileLines)
+			        	sb.append("<div class='insert'>" + s + "</div>");
+			        jep.setText(sb.toString());
+				} catch (MissingObjectException e1) {
+					ShowError(e1.getMessage());
+				} catch (IncorrectObjectTypeException e1) {
+					ShowError(e1.getMessage());
+				} catch (CorruptObjectException e1) {
+					ShowError(e1.getMessage());
+				} catch (IOException e1) {
+					ShowError(e1.getMessage());
+				}
+			}
+		});
 		
 		URL combinedURL = JToolBarExtended.class.getResource("images/IconCombined.png");
 		JButton combinedView = new JButton();
@@ -581,7 +590,12 @@ public class Test {
 			        }
 			        ObjectLoader loader2 = Repozitorij.open(treeWalk2.getObjectId(0));
 			        
-			        fileDiff(loader1.getBytes(), loader2.getBytes(), jep);
+			        Date left = ((RevCommitSpecial)commitList1.getSelectedItem()).getRevCommit().getAuthorIdent().getWhen();
+			        Date right = ((RevCommitSpecial)commitList2.getSelectedItem()).getRevCommit().getAuthorIdent().getWhen();
+			        if (left.compareTo(right) < 0)
+			        	fileDiff(loader1.getBytes(), loader2.getBytes(), jep);
+			        else
+			        	fileDiff(loader2.getBytes(), loader1.getBytes(), jep);
 				} catch (MissingObjectException e1) {
 					ShowError(e1.getMessage());
 				} catch (IncorrectObjectTypeException e1) {
@@ -595,9 +609,8 @@ public class Test {
 			}
 		});
 		
-		frmUpravljanjeRevizijama.getContentPane().add(revertCommit, "cell 1 3, width 140");
-		frmUpravljanjeRevizijama.getContentPane().add(showContent, "cell 1 3, gapleft 5, width 140");
-		frmUpravljanjeRevizijama.getContentPane().add(combinedView, "cell 1 3, gapleft push");
+		frmUpravljanjeRevizijama.getContentPane().add(showContent, "cell 1 3, width 19%");
+		frmUpravljanjeRevizijama.getContentPane().add(combinedView, "cell 1 3, gapleft 5, width 19%");
 		
 		//********************************************************************************************
 		// EDITOR
@@ -656,6 +669,7 @@ public class Test {
 					if (n == JOptionPane.YES_OPTION) {
 						progressBar.setIndeterminate(true);
 						progressBar.setStringPainted(true);
+						progressBar.setForeground(Color.BLACK);
 						if (conf.getClone()) {
 							progressBar.setString("Kloniranje repozitorija: " + REMOTE_URL);
 							Git.cloneRepository().setURI(REMOTE_URL).setCredentialsProvider(credentialsProvider).setDirectory(new File(AdresaRepozitorija)).call();
@@ -672,6 +686,7 @@ public class Test {
 				progressBar.setIndeterminate(true);
 				progressBar.setStringPainted(true);
 				progressBar.setString("Učitavanje repozitorija");
+				progressBar.setForeground(Color.BLACK);
 				
 				Repozitorij = builder.setGitDir(new File(AdresaRepozitorija, ".git")).readEnvironment().findGitDir().build();
 				git = new Git(Repozitorij);
@@ -830,6 +845,7 @@ public class Test {
         	progressBar.setIndeterminate(true);
 			progressBar.setStringPainted(true);
 			progressBar.setString("Arhiviranje repozitorija u toku");
+			progressBar.setForeground(Color.BLACK);
 			try {
 				ArchiveCommand.registerFormat("zip", new ZipArchiveFormat());
 				OutputStream out = new FileOutputStream(new File(outputDirectory, Repozitorij.getBranch() + ".zip"));
@@ -869,6 +885,7 @@ public class Test {
         		progressBar.setIndeterminate(true);
 				progressBar.setStringPainted(true);
 				progressBar.setString("Učitavanje u toku");
+				progressBar.setForeground(Color.BLACK);
 				
 				toolBarRepositoryOperations.setRepository(Repozitorij);
 				txtDirektorij.setText(Repozitorij.getWorkTree().getCanonicalPath());

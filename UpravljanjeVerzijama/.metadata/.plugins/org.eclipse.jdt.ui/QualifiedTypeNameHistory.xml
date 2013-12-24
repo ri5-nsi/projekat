@@ -1,31 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <qualifiedTypeNameHistroy>
-<fullyQualifiedTypeName name="Test.LoadRepository"/>
-<fullyQualifiedTypeName name="javax.swing.JTree"/>
-<fullyQualifiedTypeName name="javax.swing.tree.DefaultMutableTreeNode"/>
-<fullyQualifiedTypeName name="javax.swing.tree.TreePath"/>
-<fullyQualifiedTypeName name="org.eclipse.jgit.lib.Repository"/>
-<fullyQualifiedTypeName name="org.eclipse.jgit.api.Git"/>
-<fullyQualifiedTypeName name="java.nio.file.Files"/>
-<fullyQualifiedTypeName name="java.nio.file.StandardCopyOption"/>
-<fullyQualifiedTypeName name="javax.swing.JFileChooser"/>
-<fullyQualifiedTypeName name="java.io.File"/>
-<fullyQualifiedTypeName name="de.javasoft.io.FileUtils"/>
-<fullyQualifiedTypeName name="org.apache.commons.io.FileUtils"/>
-<fullyQualifiedTypeName name="java.io.IOException"/>
-<fullyQualifiedTypeName name="com.sun.media.sound.InvalidFormatException"/>
-<fullyQualifiedTypeName name="JToolBarExtended"/>
-<fullyQualifiedTypeName name="javax.swing.SwingWorker"/>
-<fullyQualifiedTypeName name="JToolBarExtended.RepositoryOperations"/>
-<fullyQualifiedTypeName name="javax.swing.JProgressBar"/>
-<fullyQualifiedTypeName name="java.awt.Color"/>
-<fullyQualifiedTypeName name="javax.swing.JOptionPane"/>
 <fullyQualifiedTypeName name="org.omg.CORBA.INITIALIZE"/>
 <fullyQualifiedTypeName name="javax.swing.SwingUtilities"/>
 <fullyQualifiedTypeName name="java.sql.Statement"/>
 <fullyQualifiedTypeName name="java.sql.ResultSet"/>
 <fullyQualifiedTypeName name="javax.swing.JTextField"/>
-<fullyQualifiedTypeName name="javax.swing.JLabel"/>
 <fullyQualifiedTypeName name="javax.swing.JCheckBox"/>
 <fullyQualifiedTypeName name="javax.swing.JPasswordField"/>
 <fullyQualifiedTypeName name="com.thoughtworks.xstream.io.xml.StaxDriver"/>
@@ -60,4 +39,25 @@
 <fullyQualifiedTypeName name="Test.ArchiveBranch"/>
 <fullyQualifiedTypeName name="org.eclipse.jgit.errors.RevisionSyntaxException"/>
 <fullyQualifiedTypeName name="org.eclipse.jgit.api.errors.GitAPIException"/>
+<fullyQualifiedTypeName name="javax.swing.event.ListSelectionListener"/>
+<fullyQualifiedTypeName name="javax.swing.event.ListSelectionEvent"/>
+<fullyQualifiedTypeName name="Configuration"/>
+<fullyQualifiedTypeName name="org.eclipse.jgit.lib.StoredConfig"/>
+<fullyQualifiedTypeName name="org.eclipse.jgit.transport.RemoteConfig"/>
+<fullyQualifiedTypeName name="org.eclipse.jgit.api.PushCommand"/>
+<fullyQualifiedTypeName name="org.eclipse.jgit.transport.RefSpec"/>
+<fullyQualifiedTypeName name="java.lang.System"/>
+<fullyQualifiedTypeName name="java.awt.event.MouseAdapter"/>
+<fullyQualifiedTypeName name="java.awt.event.MouseEvent"/>
+<fullyQualifiedTypeName name="javax.swing.JButton"/>
+<fullyQualifiedTypeName name="javax.swing.JLabel"/>
+<fullyQualifiedTypeName name="java.lang.Exception"/>
+<fullyQualifiedTypeName name="java.awt.Font"/>
+<fullyQualifiedTypeName name="org.eclipse.jgit.api.ResetCommand.ResetType"/>
+<fullyQualifiedTypeName name="Test.RefreshRepository"/>
+<fullyQualifiedTypeName name="org.eclipse.jgit.api.errors.InvalidRemoteException"/>
+<fullyQualifiedTypeName name="org.eclipse.jgit.transport.PushResult"/>
+<fullyQualifiedTypeName name="org.eclipse.jgit.api.PullResult"/>
+<fullyQualifiedTypeName name="org.eclipse.jgit.api.MergeResult.MergeStatus"/>
+<fullyQualifiedTypeName name="java.util.Date"/>
 </qualifiedTypeNameHistroy>

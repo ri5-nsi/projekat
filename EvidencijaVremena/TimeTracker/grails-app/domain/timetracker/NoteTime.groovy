@@ -61,4 +61,21 @@ class NoteTime {
 		//test = "Testni podatak"
 		
 	}
+	public void editujComment(String text, String CommentID)
+	{
+		
+		String query = "UPDATE public.comment SET text='"+text+"' WHERE comment_id='"+CommentID+"';";
+		
+		dbHelper.ExecuteQuery(query);
+		
+		
+		
+		
+	}
+	public void DeleteComment(String uid)
+	{
+	   
+		String query = "DELETE FROM public.comment WHERE comment_id='" +uid+ "';";
+		dbHelper.ExecuteQuery(query);
+	}
 }

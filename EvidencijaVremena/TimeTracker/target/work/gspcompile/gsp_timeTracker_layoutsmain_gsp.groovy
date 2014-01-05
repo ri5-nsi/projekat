@@ -53,14 +53,14 @@ createTagBody(1, {->
 printHtmlPart(8)
 expressionOut.print(session.user.Username)
 printHtmlPart(9)
-invokeTag('layoutBody','g',53,[:],-1)
+invokeTag('layoutBody','g',55,[:],-1)
 printHtmlPart(10)
 expressionOut.print(resource(dir: 'js', file: 'bootstrap.min.js'))
 printHtmlPart(11)
-invokeTag('javascript','g',57,['library':("application")],-1)
+invokeTag('javascript','g',59,['library':("application")],-1)
 printHtmlPart(7)
 })
-invokeTag('captureBody','sitemesh',58,[:],1)
+invokeTag('captureBody','sitemesh',60,[:],1)
 printHtmlPart(12)
 }
 public static final Map JSP_TAGS = new HashMap()
@@ -68,9 +68,9 @@ protected void init() {
 	this.jspTags = JSP_TAGS
 }
 public static final String CONTENT_TYPE = 'text/html;charset=UTF-8'
-public static final long LAST_MODIFIED = 1385465677749L
+public static final long LAST_MODIFIED = 1388743226142L
 public static final String EXPRESSION_CODEC = 'html'
 public static final String STATIC_CODEC = 'none'
-public static final String OUT_CODEC = 'none'
+public static final String OUT_CODEC = 'html'
 public static final String TAGLIB_CODEC = 'none'
 }

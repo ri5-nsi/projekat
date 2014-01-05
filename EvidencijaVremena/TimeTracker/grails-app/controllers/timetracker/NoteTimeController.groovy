@@ -68,16 +68,18 @@ class NoteTimeController {
 		data['page'] = 1
 		
 		int i = 0;
-		ResultSet rs = dbHelper.ExecuteQuery("SELECT u.username, t.name taskname, te.date, hours_recorder, c.text  FROM public.timesheet_evidence te JOIN public.task t ON t.task_id = te.task JOIN public.timesheet ts ON ts.timesheet_id = te.timesheet JOIN public.user u ON u.user_id = ts.user_id JOIN public.comment c ON c.timesheet = ts.timesheet_id");
+		ResultSet rs = dbHelper.ExecuteQuery("SELECT u.username, c.comment_id, t.name taskname, te.date, hours_recorder, c.text  FROM public.timesheet_evidence te JOIN public.task t ON t.task_id = te.task JOIN public.timesheet ts ON ts.timesheet_id = te.timesheet JOIN public.user u ON u.user_id = ts.user_id JOIN public.comment c ON c.timesheet = ts.timesheet_id");
 		while(rs.next())
 		{
+			String uid=rs.getObject("comment_id") as String
 			def value = [:]
 			value.id = rs.getObject("username") as String
 			value.date = rs.getObject("date") as String
 			value.hours = rs.getObject("hours_recorder") as String
 			value.name = rs.getObject("taskname") as String
 			value.comment = rs.getObject("text") as String
-			
+			value.actions = "<a href=\"editComment?CommentID="+uid+"\" >Edit Comment</a> | <a href=\"deleteComment?CommentID="+uid+"\" >Delete</a>"
+			 
 			rows << [cell: value];
 			i++;
 		}
@@ -87,6 +89,35 @@ class NoteTimeController {
 		render data as JSON
 	}
 	
+	def editComment(){
+		/*String uid = params.CommentID;
+		timetracker.NoteTime proj = new timetracker.NoteTime();
+		proj.LoadComment(uid);*/
+		
+		timetracker.Category usr = new timetracker.Category();
+        def map = [category: usr];
+      
+		render(view:"editUser", model: map);
+	}
+	
+	def editujComment()
+	{
+		timetracker.NoteTime proj = new timetracker.NoteTime();
+		
+		proj.editujComment(params.text, params.CommentID);
+		redirect(action: "index")
+	}
+	
+	
+	def deleteComment()
+	{
+		String uid = params.CommentID;
+		timetracker.NoteTime proj = new timetracker.NoteTime();
+		proj.DeleteComment(uid);
+		redirect(action: "index")
+	}
+	
+
 	def getProjectsDiv() {
 		def data = [:]
 		def rows = []

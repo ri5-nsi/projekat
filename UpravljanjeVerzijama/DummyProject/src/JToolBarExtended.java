@@ -192,7 +192,8 @@ public class JToolBarExtended extends JPanel implements ActionListener {
 					progressBar.setForeground(Color.BLACK);
 					progressBar.setString("Sinhronizacija sa centralnim repozitorijem u toku!");
                 	String refspec = git.getRepository().getFullBranch();
-                	Iterable<PushResult> rezultati = git.push().setCredentialsProvider(Test.credentialsProvider).setRefSpecs(new RefSpec(refspec)).call();
+                	//Iterable<PushResult> rezultati = git.push().setCredentialsProvider(Test.credentialsProvider).setRefSpecs(new RefSpec(currentBranch.getText())).call();
+                	git.push().setCredentialsProvider(Test.credentialsProvider).add(currentBranch.getText()).call();
 				} catch (InvalidRemoteException e1) {
 					ShowError(e1.getMessage());
 				} catch (Exception e) {
@@ -241,8 +242,10 @@ public class JToolBarExtended extends JPanel implements ActionListener {
 						progressBar.setString("Kopiranje i dodavanje izabranih datoteka u toku!");
     			    	File[] selectedFiles = chooser.getSelectedFiles();
     			    	for (File f: selectedFiles) {
-    			    		if (f.isDirectory())
-    			    			FileUtils.copyDirectory(f, destination);
+    			    		if (f.isDirectory()) {
+    			    			File temp = new File(destination.getCanonicalPath() + "/" + f.getName());
+    			    			FileUtils.copyDirectory(f, temp);
+    			    		}
     			    		else if (f.isFile())
     			    			FileUtils.copyFileToDirectory(f, destination);
     			    		git.add().addFilepattern(GetSelectionPath(false,true) + "/" + f.getName()).call();

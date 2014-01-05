@@ -23,13 +23,16 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.jgit.api.ArchiveCommand;
+import org.eclipse.jgit.api.CreateBranchCommand.SetupUpstreamMode;
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.ListBranchCommand.ListMode;
 import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.errors.CheckoutConflictException;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.InvalidRefNameException;
 import org.eclipse.jgit.api.errors.InvalidRemoteException;
 import org.eclipse.jgit.api.errors.NoHeadException;
+import org.eclipse.jgit.api.errors.NotMergedException;
 import org.eclipse.jgit.api.errors.RefAlreadyExistsException;
 import org.eclipse.jgit.api.errors.RefNotFoundException;
 import org.eclipse.jgit.api.errors.TransportException;
@@ -44,6 +47,7 @@ import org.eclipse.jgit.errors.MissingObjectException;
 import org.eclipse.jgit.errors.NoWorkTreeException;
 import org.eclipse.jgit.errors.RevisionSyntaxException;
 import org.eclipse.jgit.lib.RepositoryCache.FileKey;
+import org.eclipse.jgit.merge.MergeStrategy;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevTree;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
@@ -98,6 +102,8 @@ import difflib.DiffUtils;
 import difflib.Patch;
 
 import java.awt.Font;
+
+// https://www.atlassian.com/git/tutorial
 
 public class Test {
 
@@ -187,7 +193,7 @@ public class Test {
 		frmKonfiguracija = new JFrame();
 		frmKonfiguracija.setTitle("Konfiguracija");
 		frmKonfiguracija.setBounds(100, 100, 400, 260);
-		frmKonfiguracija.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+		frmKonfiguracija.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		frmKonfiguracija.setLocationRelativeTo(null);
 		if (getLocalIcon("IconConf", "Konfiguracija") != null)
 			frmKonfiguracija.setIconImage(getLocalIcon("IconConf", "Konfiguracija").getImage());
@@ -235,8 +241,14 @@ public class Test {
 					korisnikKonfiguracija.setText(conf.getKorisnik());
 					emailKonfiguracija.setText(conf.getEmail());
 					conf.setClone(useRemoteKonfiguracija.isSelected());
-				} else
+				} else {
+					korisnikKonfiguracija.setText("");
+					emailKonfiguracija.setText("");
+					usernameKonfiguracija.setText("");
+					passwordKonfiguracija.setText("");
+					conf.setClone(useRemoteKonfiguracija.isSelected());
 					JOptionPane.showMessageDialog(frmKonfiguracija, "Prijava nije uspjela, provjerite pristupne podatke!", "Greška!", JOptionPane.ERROR_MESSAGE);
+				}
 			}
 		});
 		frmKonfiguracija.getContentPane().add(new JLabel());
@@ -274,7 +286,7 @@ public class Test {
 		frmUpravljanjeRevizijama.setLocationRelativeTo(null);
 		if (getLocalIcon("MainIcon", "Glavna ikona") != null)
 			frmUpravljanjeRevizijama.setIconImage(getLocalIcon("MainIcon", "Glavna ikona").getImage());
-		frmUpravljanjeRevizijama.getContentPane().setLayout(new MigLayout("fillx, insets 10", "[][grow]", "[]10[270][][][220]:push[]"));
+		frmUpravljanjeRevizijama.getContentPane().setLayout(new MigLayout("fillx, insets 10", "[][grow]", "[]10[270][][][220,top]:push[]"));
 		
 		btnRevisions = new JButton(getLocalIcon("IconConf", "Korisnik"));
 		btnRevisions.setText("Konfiguracija");
@@ -343,7 +355,7 @@ public class Test {
 		        try {
 		        	if (git == null || !conf.IsAuthenticated())
 		        		return;
-		        	String selectedBranch = tableBranches.getValueAt(tableBranches.getSelectedRow(), 0).toString();
+		        	String selectedBranch = tableBranches.getValueAt(tableBranches.getSelectedRow(), 0).toString().replace("refs/remotes/origin/", "refs/heads/");
 					git.checkout().setName(selectedBranch).call();
 					toolBarRepositoryOperations.getCurrentBranch().setText("  " + Repozitorij.getFullBranch());
 					new RefreshRepository().execute();
@@ -424,7 +436,7 @@ public class Test {
 		JButton addBranch = new JButton();
 		if (addBranchURL != null)
 			addBranch.setIcon(new ImageIcon(addBranchURL, "Dodaj"));
-		addBranch.setText("Dodaj");
+		addBranch.setText("[+] Dodaj");
 		addBranch.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (git == null || !conf.IsAuthenticated())
@@ -454,7 +466,7 @@ public class Test {
 		JButton deleteBranch = new JButton();
 		if (deleteBranchURL != null)
 			deleteBranch.setIcon(new ImageIcon(addBranchURL, "Obriši"));
-		deleteBranch.setText("Obriši");
+		deleteBranch.setText("[-] Obriši");
 		deleteBranch.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (git == null || !conf.IsAuthenticated())
@@ -464,6 +476,11 @@ public class Test {
 					String deleteBranch = tableBranches.getValueAt(tableBranches.getSelectedRow(), 0).toString();
 					if (deleteBranch.endsWith("master"))
 						ShowError("Master branch nije dozvoljeno obrisati");
+					else if (toolBarRepositoryOperations.getCurrentBranch().equals(deleteBranch))
+						ShowError("Nije moguće obrisati branch koji je trenutno aktivan");
+					else if (deleteBranch.startsWith("refs/remotes/origin")) {
+						ShowError("Remote branch nije dozvoljeno brisati");
+					}
 					else {
 						try {
 							Object[] options = {"Potvrdi", "Odustani"};
@@ -473,9 +490,14 @@ public class Test {
 								git.branchDelete().setBranchNames(deleteBranch).call();
 								((DefaultTableModel)tableBranches.getModel()).removeRow(tableBranches.getSelectedRow());
 							}
+						} catch (NotMergedException e1) {
+							ShowError("Izabrani branch nije spojen sa aktivnim branchom");
+							System.err.println(e1.getMessage());
 						} catch (GitAPIException e1) {
 							ShowError("Problem pri brisanju brancha");
+							System.err.println(e1.getMessage());
 						}
+						
 					}	
 				}
 				else
@@ -485,6 +507,46 @@ public class Test {
 		frmUpravljanjeRevizijama.getContentPane().add(addBranch, "cell 0 2, align left, gapright 2, growx");
 		frmUpravljanjeRevizijama.getContentPane().add(deleteBranch, "cell 0 2, gapleft 2 push, growx");
 		
+		URL mergeURL = JToolBarExtended.class.getResource("images/IconMerge.png");
+		JButton mergeBranch = new JButton();
+		mergeBranch.setIcon(new ImageIcon(mergeURL, "Merge"));
+		mergeBranch.setText("Spoji branch");
+		mergeBranch.setIconTextGap(10);
+		mergeBranch.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (git == null || !conf.IsAuthenticated())
+					return;
+				
+				if (tableBranches.getSelectedRow() >= 0) {
+					String selectedBranch = tableBranches.getValueAt(tableBranches.getSelectedRow(), 0).toString();
+					if (selectedBranch.endsWith("master"))
+						ShowError("Master branch nije moguće spojiti");
+					else {
+						try {
+							Object[] options = {"Potvrdi", "Odustani"};
+							int n = JOptionPane.showOptionDialog(frmUpravljanjeRevizijama, "Odabrani branch će biti trajno spojen sa master branchom. Da li ste sigurni?",
+									"Spoji branch", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+							if (n == JOptionPane.YES_OPTION) {
+								git.checkout().setName("refs/heads/master").call();
+								git.merge().setCommit(true).include(Repozitorij.getRef(selectedBranch)).setStrategy(MergeStrategy.RECURSIVE).call();
+								if (!selectedBranch.startsWith("refs/remotes/origin")) {
+									((DefaultTableModel)tableBranches.getModel()).removeRow(tableBranches.getSelectedRow());
+									git.branchDelete().setBranchNames(selectedBranch).call();
+								}
+								toolBarRepositoryOperations.getCurrentBranch().setText("  " + Repozitorij.getFullBranch());
+								new RefreshRepository().execute();
+							}
+						} catch (GitAPIException e1) {
+							ShowError("Problem pri spajanju brancha");
+						} catch (IOException e1) {
+							ShowError("Problem pri spajanju brancha");
+						}
+					}	
+				}
+				else
+					ShowError("Morate označiti branch koji želite spojiti");
+			}
+		});
 		URL zipURL = JToolBarExtended.class.getResource("images/IconZip.png");
 		JButton zipBranch = new JButton();
 		zipBranch.setIcon(new ImageIcon(zipURL, "Export"));
@@ -515,10 +577,10 @@ public class Test {
 						ShowError(e1.getMessage());
 					}
 			    }
-				
 			}
 		});
-		frmUpravljanjeRevizijama.getContentPane().add(zipBranch, "cell 0 3, growx");
+		frmUpravljanjeRevizijama.getContentPane().add(mergeBranch, "cell 0 3, growx");
+		frmUpravljanjeRevizijama.getContentPane().add(zipBranch, "cell 0 4, growx");
 		
 		URL showURL = JToolBarExtended.class.getResource("images/IconShow.png");
 		JButton showContent = new JButton();
@@ -690,17 +752,27 @@ public class Test {
 				
 				Repozitorij = builder.setGitDir(new File(AdresaRepozitorija, ".git")).readEnvironment().findGitDir().build();
 				git = new Git(Repozitorij);
+				git.fetch().setRemote("origin").call();
 				
 				int row = 0;
 				DefaultTableModel model = (DefaultTableModel)tableBranches.getModel(); 
 				int rows = model.getRowCount(); 
 				for(int i = rows - 1; i >=0; i--)
-				   model.removeRow(i); 
+				   model.removeRow(i);
+				
+				((DefaultTableModel) tableBranches.getModel()).addRow(new Object[] { "refs/heads/master" });
+				tableBranches.setRowSelectionInterval(row, row);
+				for (Ref ref : git.branchList().setListMode(ListMode.REMOTE).call()) {
+					String shortBranchName = ref.getName().replace("refs/remotes/origin/", "");
+					if (git.getRepository().getRef("refs/heads/" + shortBranchName) == null) {
+						git.branchCreate().setName(shortBranchName).setUpstreamMode(SetupUpstreamMode.SET_UPSTREAM)
+		                .setStartPoint("origin/" + shortBranchName).call();
+						((DefaultTableModel) tableBranches.getModel()).addRow(new Object[] { ref.getName() });
+					}
+				}
 				for (Ref ref : git.branchList().call()) {
-					((DefaultTableModel) tableBranches.getModel()).addRow(new Object[] { ref.getName() });
-					if (ref.getName().endsWith("master"))
-						tableBranches.setRowSelectionInterval(row, row);
-					row++;
+					if (!ref.getName().endsWith("master"))
+						((DefaultTableModel) tableBranches.getModel()).addRow(new Object[] { ref.getName().replace("refs/heads/", "refs/remotes/origin/") });
 				}
 				
 				toolBarRepositoryOperations.setRepository(Repozitorij);
